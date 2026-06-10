@@ -271,6 +271,17 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
 .col-cell-del:hover{background:#fee2e2;color:var(--danger)}
 .add-col-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:11px;border:1.5px dashed var(--border);background:transparent;border-radius:8px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--text-muted);transition:all .15s;margin-top:14px}
 .add-col-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
+/* ── PIN Modal ── */
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border);background:transparent;transition:all .2s}
+.pin-dot.filled{background:var(--primary);border-color:var(--primary);transform:scale(1.1)}
+.pin-dot.error{background:var(--danger);border-color:var(--danger)}
+.pin-numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:210px;margin:0 auto}
+.pin-key{width:100%;aspect-ratio:1;border-radius:50%;border:1.5px solid var(--border);background:var(--card);font-family:inherit;font-size:20px;font-weight:600;color:var(--text);cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.pin-key:hover:not(.pin-key-empty){background:var(--primary-light);border-color:var(--primary);color:var(--primary)}
+.pin-key:active:not(.pin-key-empty){transform:scale(.92);background:var(--primary);color:#fff}
+.pin-key-empty{border:none;background:transparent;cursor:default;pointer-events:none}
+.pin-key-del{font-size:16px;color:var(--text-muted)}
+@keyframes pinShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
 </style>
 </head>
 <body>
@@ -416,7 +427,7 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
       </div>
       <div class="picker-radio-list" id="picker-list"></div>
       <div class="picker-divider"><span>หรือ</span></div>
-      <button class="new-cat-btn" onclick="openCreateCategory()">
+      <button class="new-cat-btn" onclick="_openCreateCategory()">
         <i class="fas fa-folder-plus"></i> สร้างประเภทพัสดุใหม่
       </button>
     </div>
@@ -498,6 +509,46 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>
       <button class="btn btn-primary" onclick="saveRow()"><i class="fas fa-save"></i> บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── PIN Modal ── -->
+<div class="modal-overlay" id="pin-overlay">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-header">
+      <h2 id="pin-modal-title"><i class="fas fa-lock" style="color:var(--primary)"></i> ยืนยันตัวตน</h2>
+      <button class="modal-close" onclick="closePinModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" style="text-align:center;padding:28px 24px 20px">
+      <div style="width:56px;height:56px;border-radius:16px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:26px;color:var(--primary)">
+        <i class="fas fa-key"></i>
+      </div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:20px" id="pin-action-label">กรุณากรอก PIN เพื่อดำเนินการ</div>
+      <div style="display:flex;gap:10px;justify-content:center;margin-bottom:16px" id="pin-dots">
+        <div class="pin-dot" id="pd0"></div>
+        <div class="pin-dot" id="pd1"></div>
+        <div class="pin-dot" id="pd2"></div>
+        <div class="pin-dot" id="pd3"></div>
+      </div>
+      <input type="password" id="pin-input" maxlength="4" inputmode="numeric" pattern="[0-9]*"
+        style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px"
+        oninput="onPinInput()" onkeydown="onPinKey(event)">
+      <div class="pin-numpad" id="pin-numpad" onclick="event.stopPropagation()">
+        <button class="pin-key" onclick="pinPress('1')">1</button>
+        <button class="pin-key" onclick="pinPress('2')">2</button>
+        <button class="pin-key" onclick="pinPress('3')">3</button>
+        <button class="pin-key" onclick="pinPress('4')">4</button>
+        <button class="pin-key" onclick="pinPress('5')">5</button>
+        <button class="pin-key" onclick="pinPress('6')">6</button>
+        <button class="pin-key" onclick="pinPress('7')">7</button>
+        <button class="pin-key" onclick="pinPress('8')">8</button>
+        <button class="pin-key" onclick="pinPress('9')">9</button>
+        <button class="pin-key pin-key-empty"></button>
+        <button class="pin-key" onclick="pinPress('0')">0</button>
+        <button class="pin-key pin-key-del" onclick="pinBackspace()"><i class="fas fa-delete-left"></i></button>
+      </div>
+      <div id="pin-error" style="color:var(--danger);font-size:12px;font-weight:600;min-height:18px;margin-top:10px"></div>
     </div>
   </div>
 </div>
@@ -771,8 +822,6 @@ function buildSidebarNav(){
     </div>`).join('');
 }
 function setActiveNav(id){ document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active')); const el=document.getElementById(id); if(el)el.classList.add('active'); }
-
-function topbarAdd(){ if(S.currentCat) openAddModal(); else openCategoryPicker(); }
 
 async function showDashboard(){
   document.getElementById('view-dashboard').style.display='';
@@ -1170,7 +1219,7 @@ function keyDD(e,idx){
   else if(e.key==='Escape') closeAllDD();
 }
 
-function openEditModal(itemId){
+function _openEditModal(itemId){
   const cat = S.currentCat || S.categories.find(c => (S.allItems[c.id]||[]).some(it => it.id === itemId));
   if(!cat) return;
   if(!S.currentCat || S.currentCat.id !== cat.id) S.currentCat = cat;
@@ -1182,7 +1231,7 @@ function openEditModal(itemId){
   document.getElementById('modal-overlay').classList.add('show');
 }
 
-function openAddModal(){
+function _openAddModal(){
   if(!S.currentCat) return;
   S.editItemId = null;
   document.getElementById('modal-title').innerHTML = `<i class="fas fa-plus-circle" style="color:var(--success)"></i> เพิ่มเครื่องมือใหม่ <span style="font-size:12px;color:var(--text-muted);font-weight:400">— ${escHtml(S.currentCat.name)}</span>`;
@@ -1233,7 +1282,7 @@ async function saveRow(){
   finally { showLoading(false); }
 }
 
-function openDelModal(itemId){
+function _openDelModal(itemId){
   const cat = S.currentCat || S.categories.find(c => (S.allItems[c.id]||[]).some(it => it.id === itemId));
   const item = cat ? (S.allItems[cat.id]||[]).find(it=>it.id===itemId) : null;
   if(!item || !cat) return;
@@ -1270,7 +1319,110 @@ async function invalidate(){
   }
 }
 
+// ─── PIN Protection ───────────────────────────────────────────────────────
+const PIN_CORRECT = '4321';
+let pinBuffer = '';
+let pinCallback = null;
+
+function requirePin(actionLabel, callback){
+  // ป้องกัน PIN เปิดซ้อนกัน
+  if(document.getElementById('pin-overlay').classList.contains('show')) return;
+  pinBuffer = '';
+  pinCallback = callback;
+  document.getElementById('pin-action-label').textContent = actionLabel;
+  document.getElementById('pin-error').textContent = '';
+  renderPinDots();
+  document.getElementById('pin-overlay').classList.add('show');
+  setTimeout(()=>{ const inp = document.getElementById('pin-input'); inp.value=''; inp.focus(); }, 150);
+}
+
+function closePinModal(){
+  document.getElementById('pin-overlay').classList.remove('show');
+  pinBuffer = ''; pinCallback = null;
+}
+
+function renderPinDots(){
+  for(let i=0;i<4;i++){
+    const d = document.getElementById('pd'+i);
+    d.classList.toggle('filled', i < pinBuffer.length);
+    d.classList.remove('error');
+  }
+}
+
+function pinPress(digit){
+  if(!document.getElementById('pin-overlay').classList.contains('show')) return;
+  if(pinBuffer.length >= 4) return;
+  pinBuffer += digit;
+  renderPinDots();
+  document.getElementById('pin-error').textContent = '';
+  if(pinBuffer.length === 4) setTimeout(checkPin, 120);
+}
+
+function pinBackspace(){
+  if(!pinBuffer.length) return;
+  pinBuffer = pinBuffer.slice(0,-1);
+  renderPinDots();
+  document.getElementById('pin-error').textContent = '';
+}
+
+function checkPin(){
+  if(!document.getElementById('pin-overlay').classList.contains('show')) return;
+  if(pinBuffer === PIN_CORRECT){
+    const cb = pinCallback;
+    closePinModal();
+    if(cb) cb();
+  } else {
+    for(let i=0;i<4;i++) document.getElementById('pd'+i).classList.add('error');
+    document.getElementById('pin-dots').style.animation = 'pinShake .4s ease';
+    setTimeout(()=>{ document.getElementById('pin-dots').style.animation=''; },400);
+    document.getElementById('pin-error').textContent = 'PIN ไม่ถูกต้อง กรุณาลองใหม่';
+    pinBuffer = '';
+    setTimeout(renderPinDots, 400);
+    const inp = document.getElementById('pin-input'); inp.value=''; inp.focus();
+  }
+}
+
+// รับ keyboard input จาก hidden input
+function onPinInput(){
+  if(!document.getElementById('pin-overlay').classList.contains('show')) return;
+  const inp = document.getElementById('pin-input');
+  const digits = inp.value.replace(/\D/g,'');
+  inp.value = '';
+  for(const d of digits){ if(pinBuffer.length < 4) pinPress(d); }
+}
+function onPinKey(e){
+  if(!document.getElementById('pin-overlay').classList.contains('show')) return;
+  if(e.key==='Backspace') pinBackspace();
+  else if(e.key>='0' && e.key<='9'){ e.preventDefault(); pinPress(e.key); }
+}
+
+// ─── Protected wrappers ───────────────────────────────────────────────────
+function topbarAdd(){
+  requirePin('เพิ่มเครื่องมือใหม่', ()=>{ if(S.currentCat) _openAddModal(); else _openCategoryPicker(); });
+}
+
 function openCategoryPicker(){
+  requirePin('เพิ่มเครื่องมือใหม่', _openCategoryPicker);
+}
+
+function openCreateCategory(){
+  requirePin('สร้างประเภทพัสดุใหม่', _openCreateCategory);
+}
+
+function openAddModal(){
+  requirePin('เพิ่มเครื่องมือใหม่', _openAddModal);
+}
+
+function openEditModal(itemId){
+  requirePin('แก้ไขรายการ', ()=>_openEditModal(itemId));
+}
+
+function openDelModal(itemId){
+  requirePin('ลบรายการ', ()=>_openDelModal(itemId));
+}
+// ──────────────────────────────────────────────────────────────────────────
+
+function _openCategoryPicker(){
   S.pickerSelectedId = null;
   document.getElementById('picker-search-input').value = '';
   renderPickerList(''); updatePickerConfirmBtn();
@@ -1309,12 +1461,12 @@ function confirmCategoryPicker(){
   if(!S.pickerSelectedId) return;
   const cat = S.categories.find(c => c.id === S.pickerSelectedId);
   if(!cat){ toast('ไม่พบประเภทที่เลือก','error'); return; }
-  S.currentCat = cat; closeCategoryPicker(); openAddModal();
+  S.currentCat = cat; closeCategoryPicker(); _openAddModal();
 }
 
 let newCatCols = [];
 
-function openCreateCategory(){
+function _openCreateCategory(){
   document.getElementById('newcat-name').value = '';
   newCatCols = [
     'รหัสประเภทสินทรัพย์','หมายเลขทะเบียนครุภัณฑ์','NVH.No.','INH.No.',
@@ -1438,7 +1590,7 @@ async function confirmCreateCategory(){
     S.categories = newList || []; buildSidebarNav();
     S.dashStats = null;
     const fresh = S.categories.find(c => c.id === data.id);
-    if(fresh){ S.currentCat = fresh; openAddModal(); }
+    if(fresh){ S.currentCat = fresh; _openAddModal(); }
   } catch(e){
     if(e.message && e.message.includes('duplicate')) toast('ชื่อประเภทนี้มีอยู่แล้ว','error');
     else toast('สร้างไม่สำเร็จ: '+e.message,'error');
@@ -1621,7 +1773,7 @@ function smEdit(catId, itemId){
   S.currentCat = cat;
   const sf = smState.statusFilter, sc = smState.color;
   S._smReopen = ()=>{ if(sf === '__NO_STATUS__') openNoStatusModal(); else if(sf === '__ALL_SHEETS__') openSheetListModal(); else openStatusModal(sf, sc); };
-  openEditModal(itemId);
+  requirePin('แก้ไขรายการ', ()=>_openEditModal(itemId));
 }
 
 function smGoPage(p){
