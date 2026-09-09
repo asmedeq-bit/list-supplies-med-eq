@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>รายการพัสดุแผนกบริการเครื่องมือแพทย์</title>
+<script>
+(function(){
+  try {
+    var saved = localStorage.getItem('theme');
+    var theme = saved === 'dark' || saved === 'light' ? saved : 'dark';
+    document.documentElement.setAttribute('data-theme', theme);
+  } catch(e){ document.documentElement.setAttribute('data-theme','dark'); }
+})();
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -14,12 +23,23 @@
   --success:#10b981;--warning:#f59e0b;--danger:#ef4444;--info:#6366f1;
   --bg:#f0f4f8;--card:#fff;--border:#e2e8f0;
   --text:#1e293b;--text-muted:#64748b;
+  --thead-bg:#f8fafc;--hover-bg:#f1f5f9;--scrollbar:#cbd5e1;
   --sidebar-w:260px;--header-h:64px;
   --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.05);
   --shadow-md:0 4px 16px rgba(0,0,0,.10);--radius:12px;
 }
+[data-theme="dark"]{
+  --primary:#3b82f6;--primary-dark:#60a5fa;--primary-light:#1e3a5f;
+  --success:#34d399;--warning:#fbbf24;--danger:#f87171;--info:#818cf8;
+  --bg:#0f172a;--card:#1e293b;--border:#334155;
+  --text:#e2e8f0;--text-muted:#94a3b8;
+  --thead-bg:#182234;--hover-bg:#243044;--scrollbar:#475569;
+  --shadow:0 1px 3px rgba(0,0,0,.35),0 4px 12px rgba(0,0,0,.25);
+  --shadow-md:0 4px 20px rgba(0,0,0,.45);
+}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+html{background:var(--bg)}
+body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);font-size:14px;transition:background .25s,color .25s}
 #app{display:flex;height:100vh;overflow:hidden}
 #sidebar{width:var(--sidebar-w);background:linear-gradient(160deg,#1e429f 0%,#1a56db 60%,#1d4ed8 100%);display:flex;flex-direction:column;flex-shrink:0;height:100vh;overflow-y:auto;box-shadow:3px 0 20px rgba(0,0,0,.15);z-index:100}
 #sidebar::-webkit-scrollbar{width:4px}#sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:4px}
@@ -62,7 +82,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);fon
 .qa-title{font-size:16px;font-weight:700;margin-bottom:2px}
 .qa-sub{font-size:12px;opacity:.85}
 .qa-actions{display:flex;gap:10px;z-index:1;flex-wrap:wrap}
-.qa-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 18px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;background:#fff;color:#059669;transition:all .2s;white-space:nowrap}
+.qa-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 18px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;background:var(--card);color:#059669;transition:all .2s;white-space:nowrap}
 .qa-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.18)}
 .qa-btn.outline{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.6)}
 .qa-btn.outline:hover{background:rgba(255,255,255,.15);border-color:#fff}
@@ -72,6 +92,9 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);fon
 .stat-card:hover{border-color:var(--primary);box-shadow:0 6px 20px rgba(26,86,219,.13);transform:translateY(-2px)}
 .stat-card:hover .stat-value{color:var(--primary)}
 .stat-card:active{transform:translateY(0)}
+.stat-card.static{cursor:default}
+.stat-card.static:hover{border-color:var(--border);box-shadow:var(--shadow);transform:none}
+.stat-card.static:hover .stat-value{color:var(--text)}
 .stat-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
 .stat-icon.blue{background:#eff6ff;color:#2563eb}.stat-icon.green{background:#ecfdf5;color:#059669}
 .stat-icon.orange{background:#fff7ed;color:#d97706}.stat-icon.purple{background:#f5f3ff;color:#7c3aed}
@@ -131,18 +154,18 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);fon
 .record-count{font-size:12px;color:var(--text-muted);background:var(--bg);padding:4px 10px;border-radius:20px}
 .table-wrap{overflow:auto;flex:1;max-height:calc(100vh - 310px)}
 .table-wrap::-webkit-scrollbar{height:6px;width:6px}
-.table-wrap::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
+.table-wrap::-webkit-scrollbar-thumb{background:var(--scrollbar);border-radius:4px}
 table{width:max-content;min-width:100%;border-collapse:collapse;font-size:13px}
-thead th{padding:10px 14px;text-align:left;font-size:12px;font-weight:700;color:var(--text-muted);border-bottom:2px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;position:sticky;top:0;z-index:20;background:#f8fafc;box-shadow:inset 0 -2px 0 var(--border)}
-thead th:hover{color:var(--primary);background:#f1f5f9}
+thead th{padding:10px 14px;text-align:left;font-size:12px;font-weight:700;color:var(--text-muted);border-bottom:2px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;position:sticky;top:0;z-index:20;background:var(--thead-bg);box-shadow:inset 0 -2px 0 var(--border)}
+thead th:hover{color:var(--primary);background:var(--hover-bg)}
 thead th.sorted{color:var(--primary)}
 thead th .si{margin-left:4px;opacity:.3;font-size:10px}
 thead th.sorted .si{opacity:1}
 thead th:first-child,tbody td:first-child{position:sticky;left:0;z-index:15;background:inherit}
-thead th:first-child{z-index:25;background:#f8fafc}
-tbody tr{border-bottom:1px solid #f1f5f9;transition:background .12s}
-tbody tr:hover{background:#f8fafc}
-tbody tr:hover td:first-child{background:#f8fafc}
+thead th:first-child{z-index:25;background:var(--thead-bg)}
+tbody tr{border-bottom:1px solid var(--border);transition:background .12s}
+tbody tr:hover{background:var(--hover-bg)}
+tbody tr:hover td:first-child{background:var(--hover-bg)}
 tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle}
 .td-actions{display:flex;gap:5px;white-space:nowrap}
 .status-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
@@ -169,7 +192,7 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
 .modal-close{background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-muted);padding:4px 8px;border-radius:6px}
 .modal-close:hover{background:var(--bg)}
 .modal-body{padding:20px 24px;overflow-y:auto;flex:1}
-.modal-body::-webkit-scrollbar{width:5px}.modal-body::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
+.modal-body::-webkit-scrollbar{width:5px}.modal-body::-webkit-scrollbar-thumb{background:var(--scrollbar);border-radius:4px}
 .modal-footer{padding:14px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;flex-shrink:0}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .form-group{display:flex;flex-direction:column;gap:6px}
@@ -177,7 +200,7 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
 .form-label{font-size:12px;font-weight:600;color:var(--text-muted);display:flex;align-items:center;gap:5px}
 .badge-dd{font-size:10px;background:var(--primary-light);color:var(--primary);padding:1px 6px;border-radius:10px;font-weight:600}
 .plain-input{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none;transition:border .2s;background:var(--bg)}
-.plain-input:focus{border-color:var(--primary);background:#fff;box-shadow:0 0 0 3px rgba(26,86,219,.08)}
+.plain-input:focus{border-color:var(--primary);background:var(--card);box-shadow:0 0 0 3px rgba(26,86,219,.08)}
 
 /* ── Auto-calc readonly field ── */
 .plain-input.auto-calc{
@@ -198,12 +221,12 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
 
 .combo-wrap{position:relative}
 .combo-wrap input{width:100%;padding:9px 36px 9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none;transition:border .2s;background:var(--bg)}
-.combo-wrap input:focus{border-color:var(--primary);background:#fff;box-shadow:0 0 0 3px rgba(26,86,219,.08)}
+.combo-wrap input:focus{border-color:var(--primary);background:var(--card);box-shadow:0 0 0 3px rgba(26,86,219,.08)}
 .combo-wrap .dd-arrow{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:11px;pointer-events:none}
-.dd-list{position:absolute;top:calc(100% + 2px);left:0;right:0;background:#fff;border:1.5px solid var(--primary);border-radius:8px;max-height:200px;overflow-y:auto;z-index:1000;box-shadow:var(--shadow-md);display:none}
+.dd-list{position:absolute;top:calc(100% + 2px);left:0;right:0;background:var(--card);border:1.5px solid var(--primary);border-radius:8px;max-height:200px;overflow-y:auto;z-index:1000;box-shadow:var(--shadow-md);display:none}
 .dd-list.open{display:block}
-.dd-list::-webkit-scrollbar{width:4px}.dd-list::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
-.dd-item{padding:8px 12px;cursor:pointer;font-size:13px;transition:background .1s;border-bottom:1px solid #f1f5f9}
+.dd-list::-webkit-scrollbar{width:4px}.dd-list::-webkit-scrollbar-thumb{background:var(--scrollbar);border-radius:4px}
+.dd-item{padding:8px 12px;cursor:pointer;font-size:13px;transition:background .1s;border-bottom:1px solid var(--border)}
 .dd-item:last-child{border-bottom:none}
 .dd-item:hover,.dd-item.hl{background:var(--primary-light);color:var(--primary)}
 .dd-empty{padding:10px 12px;color:var(--text-muted);font-size:12px;text-align:center}
@@ -222,7 +245,7 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
 .sm-badge{padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700}
 .sm-count{font-size:13px;color:var(--text-muted);margin-left:auto;background:var(--bg);padding:4px 12px;border-radius:20px}
 .sm-body{overflow-y:auto;flex:1}
-.sm-body::-webkit-scrollbar{width:5px}.sm-body::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
+.sm-body::-webkit-scrollbar{width:5px}.sm-body::-webkit-scrollbar-thumb{background:var(--scrollbar);border-radius:4px}
 .sm-table-wrap{overflow-x:auto}
 .sm-search{display:flex;align-items:center;gap:8px;margin:14px 20px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:7px 12px}
 .sm-search i{color:var(--text-muted);font-size:13px}
@@ -236,7 +259,7 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
 .empty-state p{font-size:13px;line-height:1.6;max-width:480px;margin:0 auto 16px}
 
 .picker-radio-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;max-height:400px;overflow-y:auto;padding:4px}
-.picker-radio-list::-webkit-scrollbar{width:5px}.picker-radio-list::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
+.picker-radio-list::-webkit-scrollbar{width:5px}.picker-radio-list::-webkit-scrollbar-thumb{background:var(--scrollbar);border-radius:4px}
 .picker-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all .15s;background:var(--bg)}
 .picker-item:hover{border-color:var(--primary);background:var(--primary-light)}
 .picker-item.selected{border-color:var(--primary);background:var(--primary);color:#fff;box-shadow:0 4px 12px rgba(26,86,219,.25)}
@@ -253,7 +276,7 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
 .new-cat-btn:hover{border-color:var(--success);color:var(--success);background:#ecfdf5}
 
 .col-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-height:380px;overflow-y:auto;padding:4px 4px 4px 0}
-.col-grid::-webkit-scrollbar{width:5px}.col-grid::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
+.col-grid::-webkit-scrollbar{width:5px}.col-grid::-webkit-scrollbar-thumb{background:var(--scrollbar);border-radius:4px}
 .col-cell{display:flex;flex-direction:column;gap:6px;position:relative}
 .col-cell-label{font-size:12px;font-weight:600;color:var(--text-muted);display:flex;align-items:center;justify-content:space-between;gap:5px}
 .col-cell-label-left{display:flex;align-items:center;gap:6px}
@@ -266,7 +289,7 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
 .col-cell-tag.tag-number{background:#fce7f3;color:#be185d}
 .col-cell-tag.tag-text{background:#f1f5f9;color:#64748b}
 .col-cell-input{width:100%;padding:9px 36px 9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);outline:none;transition:border .2s;background:var(--bg)}
-.col-cell-input:focus{border-color:var(--primary);background:#fff;box-shadow:0 0 0 3px rgba(26,86,219,.08)}
+.col-cell-input:focus{border-color:var(--primary);background:var(--card);box-shadow:0 0 0 3px rgba(26,86,219,.08)}
 .col-cell-del{position:absolute;right:8px;top:50%;transform:translateY(2px);width:24px;height:24px;border-radius:6px;border:none;background:transparent;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-size:11px}
 .col-cell-del:hover{background:#fee2e2;color:var(--danger)}
 .add-col-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:11px;border:1.5px dashed var(--border);background:transparent;border-radius:8px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--text-muted);transition:all .15s;margin-top:14px}
@@ -288,6 +311,10 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
 .auth-logo{width:48px;height:48px;border-radius:14px;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 12px}
 .btn-logout{display:flex;align-items:center;gap:7px;width:100%;padding:8px 10px;margin-top:10px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:rgba(255,255,255,.7);cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;transition:all .15s}
 .btn-logout:hover{background:rgba(255,255,255,.14);color:#fff}
+.btn-theme-sidebar{display:flex;align-items:center;gap:7px;width:100%;padding:8px 10px;margin-top:8px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:rgba(255,255,255,.7);cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;transition:all .15s}
+.btn-theme-sidebar:hover{background:rgba(255,255,255,.14);color:#fff}
+.btn-theme-top{width:38px;height:38px;border-radius:9px;border:1.5px solid var(--border);background:var(--card);color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .2s;flex-shrink:0}
+.btn-theme-top:hover{border-color:var(--primary);color:var(--primary)}
 </style>
 </head>
 <body>
@@ -337,6 +364,7 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
     <div class="sidebar-footer">
       <div><i class="fas fa-bolt"></i> Powered by Supabase</div>
       <div style="margin-top:4px;font-size:10px;line-height:1.4">รายการพัสดุแผนกบริการเครื่องมือแพทย์</div>
+      <button class="btn-theme-sidebar" onclick="toggleTheme()"><i class="fas fa-sun" id="theme-icon-sidebar"></i> <span id="theme-label-sidebar">โหมดสว่าง</span></button>
       <button class="btn-logout" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</button>
     </div>
   </nav>
@@ -347,6 +375,7 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
         <div class="page-title" id="page-title">Dashboard</div>
         <span class="page-subtitle" id="page-subtitle">ภาพรวมรายการพัสดุทั้งหมด</span>
       </div>
+      <button class="btn-theme-top" onclick="toggleTheme()" id="btn-theme-top" title="สลับโหมดมืด/สว่าง"><i class="fas fa-sun" id="theme-icon-top"></i></button>
       <button class="btn btn-ghost btn-sm" onclick="refreshData()"><i class="fas fa-sync-alt"></i> รีเฟรช</button>
       <button class="btn btn-primary" onclick="topbarAdd()" id="btn-add"><i class="fas fa-plus"></i> เพิ่มเครื่องมือใหม่</button>
     </div>
@@ -365,6 +394,10 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
           </div>
         </div>
 
+        <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+          <button class="btn btn-ghost btn-sm" onclick="exportDashboardPDF()"><i class="fas fa-file-pdf"></i> ส่งออกรายงานสรุป Dashboard</button>
+        </div>
+
         <div id="dash-content">
           <div class="stat-grid" id="stat-grid"></div>
           <div class="chart-grid">
@@ -379,6 +412,21 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
                 <div class="donut-legend" id="donut-legend"></div>
               </div>
             </div>
+          </div>
+          <div class="chart-grid">
+            <div class="chart-card">
+              <div class="chart-title"><i class="fas fa-coins" style="color:#d97706"></i> มูลค่าพัสดุแต่ละประเภท</div>
+              <div class="bar-chart" id="chart-value-by-cat"><div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px 0">กำลังคำนวณ...</div></div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-title"><i class="fas fa-hospital" style="color:#0891b2"></i> จำนวนพัสดุแยกตามแผนก</div>
+              <div class="bar-chart" id="chart-by-dept"><div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px 0">กำลังคำนวณ...</div></div>
+            </div>
+          </div>
+          <div class="chart-card" style="margin-bottom:16px">
+            <div class="chart-title"><i class="fas fa-calendar-alt" style="color:#7c3aed"></i> จำนวนพัสดุที่ได้มาแยกตามปีงบประมาณ <span style="font-size:11px;color:var(--text-muted);font-weight:400;margin-left:6px">คลิกแท่งกราฟเพื่อดูรายการ</span></div>
+            <div id="chart-fiscal-year-warning" style="display:none;font-size:12px;color:var(--warning);background:#fef3c722;border:1px solid #fde68a;border-radius:8px;padding:8px 12px;margin-bottom:12px"></div>
+            <div class="bar-chart" id="chart-fiscal-year"><div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px 0">กำลังคำนวณ...</div></div>
           </div>
           <div class="chart-card" style="margin-bottom:16px">
             <div class="chart-title"><i class="fas fa-th-large" style="color:var(--info)"></i> รายการพัสดุทั้งหมด <span style="font-size:12px;color:var(--text-muted);font-weight:400;margin-left:6px">คลิกเพื่อดูรายการ</span></div>
@@ -607,11 +655,13 @@ const S = {
   allItems: {}, filteredRows: [], currentPage: 1, pageSize: 50,
   sortCol: null, sortDir: 'asc',
   editItemId: null, delItemId: null,
-  dashStats: null, activeDD: null, searchMode: 'contains',
+  dashStats: null, dashExtra: null, activeDD: null, searchMode: 'contains',
   pickerSelectedId: null
 };
 
 const COLORS = ['#2563eb','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316','#ec4899','#14b8a6','#6366f1','#84cc16','#a855f7'];
+const MIN_VALID_YEAR = 1950; // ค.ศ. — กันค่าขยะที่หลุดเข้ามาในช่องวันที่ (เช่น เลขครุภัณฑ์)
+const MAX_VALID_YEAR = new Date().getFullYear() + 5; // อนุญาตให้ล่วงหน้าได้เล็กน้อย (คีย์ข้อมูลล่วงหน้า)
 const DATE_FIELDS = ['รับมาวันที่','วันหมดอายุ','วันเดือนปีที่ได้มา','วันเดือนปี ที่ได้มา'];
 const NUM_FIELDS = ['ราคาต่อหน่วย','มูลค่าการได้มา','อายุใช้งานที่กำหนด(ปี )','อายุใช้งานที่กำหนด (ปี)','อายุใช้งานที่กำหนด(ปี)'];
 const TEXT_ONLY_FIELDS = ['NVH.No.','INH.No.','NVH. No','ปีงบประมาณ','ปี งป.','อายุใช้งานคงเหลือ(ปี / เดือน)','อายุใช้งาน คงเหลือ (ปี/เดือน)','หมายเลขทะเบียนครุภัณฑ์','หมายเลขรหัสสินทรัพย์ (1)','หมายเลขรหัสสินทรัพย์ (2)','รหัสประเภทสินทรัพย์','รหัสศูนย์ ต้นทุน','รหัสจังหวัด','SN','เลขที่ DTO'];
@@ -668,6 +718,74 @@ function isAcquireDateCol(h){
 }
 
 /**
+ * แปลงข้อความวันที่รูปแบบต่างๆ เป็น Date object (ใช้ร่วมกันโดย calcRemainingLife และ getFiscalYear)
+ * รองรับ: YYYY-MM-DD, DD/MM/YYYY, D/M/YYYY, MM/YYYY, YYYY, BBBB(พ.ศ.)
+ */
+function parseFlexibleDate(dateStr){
+  if(dateStr === undefined || dateStr === null || String(dateStr).trim() === '') return null;
+  const ds = String(dateStr).trim();
+  let d = null;
+
+  if(/^\d{4}-\d{2}-\d{2}$/.test(ds)){
+    const p = ds.split('-');
+    let yr = parseInt(p[0],10);
+    if(yr > 2400) yr -= 543;
+    d = new Date(yr, parseInt(p[1],10)-1, parseInt(p[2],10));
+  } else if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(ds)){
+    const p = ds.split('/');
+    let yr = parseInt(p[2],10);
+    if(yr > 2400) yr -= 543;
+    d = new Date(yr, parseInt(p[1],10)-1, parseInt(p[0],10));
+  } else if(/^\d{1,2}\/\d{4}$/.test(ds)){
+    const p = ds.split('/');
+    let yr = parseInt(p[1],10);
+    if(yr > 2400) yr -= 543;
+    d = new Date(yr, parseInt(p[0],10)-1, 1);
+  } else if(/^\d{4}-\d{2}$/.test(ds)){
+    const p = ds.split('-');
+    let yr = parseInt(p[0],10);
+    if(yr > 2400) yr -= 543;
+    d = new Date(yr, parseInt(p[1],10)-1, 1);
+  } else if(/^\d{4}$/.test(ds)){
+    let yr = parseInt(ds,10);
+    if(yr > 2400) yr -= 543;
+    d = new Date(yr, 0, 1);
+  } else {
+    return null;
+  }
+
+  if(!d || isNaN(d.getTime())) return null;
+  const y = d.getFullYear();
+  if(y < MIN_VALID_YEAR || y > MAX_VALID_YEAR) return null;
+  return d;
+}
+
+/**
+ * ปีงบประมาณไทย (1 ต.ค. - 30 ก.ย.) จากวันที่ได้มา — คืนค่าเป็น พ.ศ.
+ * เดือน ต.ค.-ธ.ค. อยู่ในปีงบประมาณถัดไป
+ */
+function getFiscalYear(dateStr){
+  const d = parseFlexibleDate(dateStr);
+  if(!d) return null;
+  const month = d.getMonth() + 1;
+  const buddhistYear = d.getFullYear() + 543;
+  return month >= 10 ? buddhistYear + 1 : buddhistYear;
+}
+
+/** คอลัมน์มูลค่าการได้มา (สำหรับรวมมูลค่าทรัพย์สิน) */
+function isValueCol(h){ return normH(h) === 'มูลค่าการได้มา'; }
+
+function parseNumber(v){
+  if(v === undefined || v === null) return 0;
+  const n = parseFloat(String(v).replace(/,/g,'').trim());
+  return isNaN(n) ? 0 : n;
+}
+
+function formatBaht(n){
+  return '฿' + Number(n||0).toLocaleString('th-TH', { maximumFractionDigits: 0 });
+}
+
+/**
  * คำนวณอายุคงเหลือ
  * วันหมดอายุ = วันที่ได้มา + อายุที่กำหนด(ปี)
  * อายุคงเหลือ = วันหมดอายุ − วันนี้
@@ -677,33 +795,8 @@ function calcRemainingLife(dateStr, lifespanYears){
   if(dateStr === undefined || dateStr === null || String(dateStr).trim() === '') return null;
   if(lifespanYears === undefined || lifespanYears === null || String(lifespanYears).trim() === '') return null;
 
-  let acquireDate = null;
-  const ds = String(dateStr).trim();
-
-  if(/^\d{4}-\d{2}-\d{2}$/.test(ds)){
-    acquireDate = new Date(ds + 'T00:00:00');
-  } else if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(ds)){
-    const p = ds.split('/');
-    let yr = parseInt(p[2],10);
-    if(yr > 2400) yr -= 543;
-    acquireDate = new Date(yr, parseInt(p[1],10)-1, parseInt(p[0],10));
-  } else if(/^\d{1,2}\/\d{4}$/.test(ds)){
-    const p = ds.split('/');
-    let yr = parseInt(p[1],10);
-    if(yr > 2400) yr -= 543;
-    acquireDate = new Date(yr, parseInt(p[0],10)-1, 1);
-  } else if(/^\d{4}-\d{2}$/.test(ds)){
-    const p = ds.split('-');
-    acquireDate = new Date(parseInt(p[0],10), parseInt(p[1],10)-1, 1);
-  } else if(/^\d{4}$/.test(ds)){
-    let yr = parseInt(ds,10);
-    if(yr > 2400) yr -= 543;
-    acquireDate = new Date(yr, 0, 1);
-  } else {
-    return null;
-  }
-
-  if(!acquireDate || isNaN(acquireDate.getTime())) return null;
+  const acquireDate = parseFlexibleDate(dateStr);
+  if(!acquireDate) return null;
 
   // แปลงอายุที่กำหนด — รองรับ "10", "10 ปี", "10.5", "10 ปี 6 เดือน"
   const lsStr = String(lifespanYears).trim();
@@ -819,6 +912,25 @@ function arrToObj(arr, headers){ const o={}; headers.forEach((h,i)=>{ o[h] = arr
 window.addEventListener('load', checkAuthAndInit);
 document.addEventListener('click', e => { if(S.activeDD && !S.activeDD.contains(e.target)) closeAllDD(); });
 
+// ─── Dark / Light theme ─────────────────────────────────────────────────
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('theme', next); } catch(e){}
+  syncThemeIcons(next);
+}
+function syncThemeIcons(theme){
+  const isDark = theme === 'dark';
+  const iconTop = document.getElementById('theme-icon-top');
+  const iconSide = document.getElementById('theme-icon-sidebar');
+  const labelSide = document.getElementById('theme-label-sidebar');
+  if(iconTop) iconTop.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+  if(iconSide) iconSide.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+  if(labelSide) labelSide.textContent = isDark ? 'โหมดสว่าง' : 'โหมดมืด';
+}
+syncThemeIcons(document.documentElement.getAttribute('data-theme') || 'dark');
+
 // ─── Auth (login) ──────────────────────────────────────────────────────────
 async function checkAuthAndInit(){
   try {
@@ -912,6 +1024,7 @@ async function showDashboard(){
   document.getElementById('page-subtitle').textContent='ภาพรวมรายการพัสดุทั้งหมด';
   S.currentCat=null; setActiveNav('nav-dashboard');
   if(!S.dashStats) await loadDashboard();
+  else if(!S.dashExtra) computeAndRenderExtraDashStats();
 }
 
 async function loadDashboard(){
@@ -932,6 +1045,7 @@ async function loadDashboard(){
     S.dashStats = stats;
     renderDashboard(stats);
     showLoading(false);
+    computeAndRenderExtraDashStats();
   } catch(e){
     showLoading(false);
     toast('โหลด Dashboard ไม่สำเร็จ: '+e.message,'error');
@@ -976,6 +1090,20 @@ function renderDashboard(st){
         <div class="stat-sub">รายการ</div>
         <div class="stat-hint"><i class="fas fa-mouse-pointer"></i> คลิกดูรายการ</div>
       </div>
+    </div>
+    <div class="stat-card static" id="stat-card-expiring">
+      <div class="stat-icon" style="background:#fee2e2;color:#dc2626"><i class="fas fa-hourglass-end"></i></div>
+      <div class="stat-info">
+        <div class="stat-label">ใกล้/หมดอายุ</div><div class="stat-value">…</div>
+        <div class="stat-sub">กำลังคำนวณ...</div>
+      </div>
+    </div>
+    <div class="stat-card static" id="stat-card-value">
+      <div class="stat-icon" style="background:#dbeafe;color:#1d4ed8"><i class="fas fa-coins"></i></div>
+      <div class="stat-info">
+        <div class="stat-label">มูลค่ารวม (มูลค่าการได้มา)</div><div class="stat-value" style="font-size:20px">…</div>
+        <div class="stat-sub">กำลังคำนวณ...</div>
+      </div>
     </div>`;
 
   const maxC = Math.max(...st.sheetStats.map(s=>s.count),1);
@@ -997,6 +1125,309 @@ function renderDashboard(st){
     </div>`).join('');
 }
 
+// ─── Extra dashboard stats (คำนวณจากรายการทั้งหมด — โหลดหลัง dashboard หลักแสดงผลแล้ว) ──
+async function computeAndRenderExtraDashStats(){
+  try {
+    await ensureAllItemsLoaded();
+    const extra = computeExtraDashStats();
+    S.dashExtra = extra;
+    renderExtraDashCards(extra);
+    renderExtraDashCharts(extra);
+  } catch(e){
+    toast('คำนวณสถิติเพิ่มเติมไม่สำเร็จ: '+e.message,'error');
+  }
+}
+
+function computeExtraDashStats(){
+  let totalValue = 0;
+  const valueByCatMap = [];
+  const deptCounts = {};
+  const fyCounts = {};
+  let expiredCount = 0, expiringSoonCount = 0, invalidDateCount = 0;
+
+  S.categories.forEach(cat => {
+    const items = S.allItems[cat.id] || [];
+    const headers = cat.headers || [];
+    const { remainIdx, lifespanIdx, dateIdx } = getLifeCalcIndices(headers);
+    const deptIdx = headers.findIndex(isDeptCol);
+    const valueIdx = headers.findIndex(isValueCol);
+    const acqDateIdx = headers.findIndex(isAcquireDateCol);
+    let catValue = 0;
+
+    items.forEach(it => {
+      if(valueIdx >= 0){
+        const v = parseNumber(it.data?.[headers[valueIdx]]);
+        catValue += v; totalValue += v;
+      }
+      if(deptIdx >= 0){
+        const d = String(it.data?.[headers[deptIdx]] || '').trim();
+        if(d) deptCounts[d] = (deptCounts[d]||0) + 1;
+      }
+      if(remainIdx >= 0 && lifespanIdx >= 0 && dateIdx >= 0){
+        const dv = String(it.data?.[headers[dateIdx]] ?? '').trim();
+        const lv = String(it.data?.[headers[lifespanIdx]] ?? '').trim();
+        if(dv && lv){
+          const res = calcRemainingLife(dv, lv);
+          if(res){
+            if(res.totalMonths <= 0) expiredCount++;
+            else if(res.totalMonths <= 12) expiringSoonCount++;
+          }
+        }
+      }
+      if(acqDateIdx >= 0){
+        const raw = String(it.data?.[headers[acqDateIdx]] ?? '').trim();
+        if(raw){
+          const fy = getFiscalYear(raw);
+          if(fy) fyCounts[fy] = (fyCounts[fy]||0) + 1;
+          else invalidDateCount++;
+        }
+      }
+    });
+
+    if(valueIdx >= 0 && catValue > 0) valueByCatMap.push({ id: cat.id, name: cat.name, value: catValue });
+  });
+
+  const deptList = Object.entries(deptCounts).map(([name,count])=>({name,count})).sort((a,b)=>b.count-a.count);
+  const fyList = Object.entries(fyCounts).map(([fy,count])=>({fy:parseInt(fy,10),count})).sort((a,b)=>a.fy-b.fy);
+  valueByCatMap.sort((a,b)=>b.value-a.value);
+
+  return { totalValue, valueByCat: valueByCatMap, deptList, fyList, expiredCount, expiringSoonCount, invalidDateCount };
+}
+
+function renderExtraDashCards(extra){
+  const expiringTotal = extra.expiredCount + extra.expiringSoonCount;
+  const cardExp = document.getElementById('stat-card-expiring');
+  if(cardExp){
+    cardExp.className = 'stat-card';
+    cardExp.title = 'ดูรายการที่ใกล้/หมดอายุ';
+    cardExp.onclick = ()=>openExpiringModal('all');
+    cardExp.innerHTML = `
+      <div class="stat-icon" style="background:#fee2e2;color:#dc2626"><i class="fas fa-hourglass-end"></i></div>
+      <div class="stat-info">
+        <div class="stat-label">ใกล้/หมดอายุ</div><div class="stat-value">${expiringTotal.toLocaleString()}</div>
+        <div class="stat-sub">หมดอายุแล้ว <span onclick="event.stopPropagation();openExpiringModal('expired')" style="color:var(--danger);cursor:pointer;text-decoration:underline">${extra.expiredCount.toLocaleString()}</span> | ใกล้หมดอายุ (≤1 ปี) <span onclick="event.stopPropagation();openExpiringModal('soon')" style="color:var(--warning);cursor:pointer;text-decoration:underline">${extra.expiringSoonCount.toLocaleString()}</span></div>
+        <div class="stat-hint"><i class="fas fa-mouse-pointer"></i> คลิกดูรายการ</div>
+      </div>`;
+  }
+  const cardVal = document.getElementById('stat-card-value');
+  if(cardVal){
+    cardVal.innerHTML = `
+      <div class="stat-icon" style="background:#dbeafe;color:#1d4ed8"><i class="fas fa-coins"></i></div>
+      <div class="stat-info">
+        <div class="stat-label">มูลค่ารวม (มูลค่าการได้มา)</div><div class="stat-value" style="font-size:20px">${formatBaht(extra.totalValue)}</div>
+        <div class="stat-sub">รวมทุกประเภทที่มีข้อมูลมูลค่า</div>
+      </div>`;
+  }
+}
+
+function renderExtraDashCharts(extra){
+  const warnEl = document.getElementById('chart-fiscal-year-warning');
+  if(warnEl){
+    if(extra.invalidDateCount > 0){
+      warnEl.style.display = '';
+      warnEl.innerHTML = `<i class="fas fa-triangle-exclamation"></i> พบข้อมูลวันที่ได้มาที่อ่านไม่ได้ ${extra.invalidDateCount.toLocaleString()} รายการ (ไม่นับรวมในกราฟนี้) — <span onclick="openInvalidDatesModal()" style="cursor:pointer;text-decoration:underline;font-weight:600">ดูรายการเพื่อไปแก้ไข</span>`;
+    } else {
+      warnEl.style.display = 'none';
+    }
+  }
+  const valEl = document.getElementById('chart-value-by-cat');
+  if(valEl){
+    if(!extra.valueByCat.length){
+      valEl.innerHTML = '<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px 0">ยังไม่มีข้อมูลมูลค่า</div>';
+    } else {
+      const maxV = Math.max(...extra.valueByCat.map(v=>v.value), 1);
+      valEl.innerHTML = extra.valueByCat.slice(0,12).map((v,i)=>`
+        <div class="bar-item" onclick="showCategoryById(${v.id})" title="คลิกดูรายการ: ${escHtml(v.name)}">
+          <div class="bar-label" title="${escHtml(v.name)}">${escHtml(v.name)}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.max(v.value/maxV*100,2)}%;background:${COLORS[i%COLORS.length]}"><span class="bar-val">${formatBaht(v.value)}</span></div></div>
+        </div>`).join('');
+    }
+  }
+  const deptEl = document.getElementById('chart-by-dept');
+  if(deptEl){
+    if(!extra.deptList.length){
+      deptEl.innerHTML = '<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px 0">ไม่มีข้อมูลแผนก</div>';
+    } else {
+      const maxD = Math.max(...extra.deptList.map(d=>d.count), 1);
+      deptEl.innerHTML = extra.deptList.slice(0,12).map((d,i)=>`
+        <div class="bar-item" onclick="openDeptModal('${escHtml(esc(d.name))}')" title="คลิกดูรายการ: ${escHtml(d.name)}">
+          <div class="bar-label" title="${escHtml(d.name)}">${escHtml(d.name)}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.max(d.count/maxD*100,2)}%;background:${COLORS[i%COLORS.length]}"><span class="bar-val">${d.count}</span></div></div>
+        </div>`).join('');
+    }
+  }
+  const fyEl = document.getElementById('chart-fiscal-year');
+  if(fyEl){
+    if(!extra.fyList.length){
+      fyEl.innerHTML = '<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px 0">ไม่มีข้อมูลวันที่ได้มา</div>';
+    } else {
+      const maxF = Math.max(...extra.fyList.map(f=>f.count), 1);
+      fyEl.innerHTML = extra.fyList.map((f,i)=>`
+        <div class="bar-item" onclick="openFiscalYearModal(${f.fy})" title="คลิกดูรายการปีงบประมาณ ${f.fy}">
+          <div class="bar-label" title="ปีงบประมาณ ${f.fy}">ปีงบ ${f.fy}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.max(f.count/maxF*100,2)}%;background:${COLORS[i%COLORS.length]}"><span class="bar-val">${f.count}</span></div></div>
+        </div>`).join('');
+    }
+  }
+}
+
+function collectRowsByPredicate(predicateFn){
+  const rows = [];
+  S.categories.forEach(cat => {
+    const items = S.allItems[cat.id] || [];
+    const headers = cat.headers || [];
+    items.forEach(it => { if(predicateFn(it, headers, cat)) rows.push({ item: it, sheetName: cat.name, headers, catId: cat.id }); });
+  });
+  return rows;
+}
+
+async function openExpiringModal(kind){
+  const labels = { all: 'ใกล้/หมดอายุ', expired: 'หมดอายุแล้ว', soon: 'ใกล้หมดอายุ (≤1 ปี)' };
+  const colors = { all: '#dc2626', expired: '#dc2626', soon: '#f59e0b' };
+  smState.statusFilter = '__EXPIRING__'; smState.color = colors[kind]||'#dc2626'; smState.smPage = 1;
+  document.getElementById('sm-search-input').value = '';
+  const badge = document.getElementById('sm-badge');
+  badge.textContent = labels[kind]||labels.all; badge.style.background = (colors[kind]||'#dc2626')+'22'; badge.style.color = colors[kind]||'#dc2626';
+  document.getElementById('sm-title').textContent = 'รายการพัสดุ: '+(labels[kind]||labels.all);
+  document.getElementById('sm-count').textContent = '...';
+  document.getElementById('sm-subtitle').textContent = 'กำลังโหลด...';
+  document.getElementById('status-overlay').classList.add('show');
+  await ensureAllItemsLoaded();
+  smState.smRows = collectRowsByPredicate((it, headers) => {
+    const { remainIdx, lifespanIdx, dateIdx } = getLifeCalcIndices(headers);
+    if(remainIdx < 0 || lifespanIdx < 0 || dateIdx < 0) return false;
+    const dv = String(it.data?.[headers[dateIdx]] ?? '').trim();
+    const lv = String(it.data?.[headers[lifespanIdx]] ?? '').trim();
+    if(!dv || !lv) return false;
+    const res = calcRemainingLife(dv, lv);
+    if(!res) return false;
+    if(kind === 'expired') return res.totalMonths <= 0;
+    if(kind === 'soon') return res.totalMonths > 0 && res.totalMonths <= 12;
+    return res.totalMonths <= 12;
+  });
+  smState.reopenFn = () => openExpiringModal(kind);
+  renderSmTable();
+}
+
+async function openDeptModal(deptName){
+  smState.statusFilter = '__DEPT__'; smState.color = '#0891b2'; smState.smPage = 1;
+  document.getElementById('sm-search-input').value = '';
+  const badge = document.getElementById('sm-badge');
+  badge.textContent = deptName; badge.style.background = '#0891b222'; badge.style.color = '#0891b2';
+  document.getElementById('sm-title').textContent = 'รายการพัสดุที่แผนก: '+deptName;
+  document.getElementById('sm-count').textContent = '...';
+  document.getElementById('sm-subtitle').textContent = 'กำลังโหลด...';
+  document.getElementById('status-overlay').classList.add('show');
+  await ensureAllItemsLoaded();
+  smState.smRows = collectRowsByPredicate((it, headers) => {
+    const dk = headers.findIndex(isDeptCol);
+    if(dk < 0) return false;
+    return String(it.data?.[headers[dk]] || '').trim() === deptName;
+  });
+  smState.reopenFn = () => openDeptModal(deptName);
+  renderSmTable();
+}
+
+async function openFiscalYearModal(fy){
+  smState.statusFilter = '__FISCAL_YEAR__'; smState.color = '#7c3aed'; smState.smPage = 1;
+  document.getElementById('sm-search-input').value = '';
+  const badge = document.getElementById('sm-badge');
+  badge.textContent = 'ปีงบ '+fy; badge.style.background = '#7c3aed22'; badge.style.color = '#7c3aed';
+  document.getElementById('sm-title').textContent = 'รายการที่ได้มาในปีงบประมาณ '+fy;
+  document.getElementById('sm-count').textContent = '...';
+  document.getElementById('sm-subtitle').textContent = 'กำลังโหลด...';
+  document.getElementById('status-overlay').classList.add('show');
+  await ensureAllItemsLoaded();
+  smState.smRows = collectRowsByPredicate((it, headers) => {
+    const dk = headers.findIndex(isAcquireDateCol);
+    if(dk < 0) return false;
+    return getFiscalYear(it.data?.[headers[dk]]) === fy;
+  });
+  smState.reopenFn = () => openFiscalYearModal(fy);
+  renderSmTable();
+}
+
+async function openInvalidDatesModal(){
+  smState.statusFilter = '__INVALID_DATE__'; smState.color = '#f59e0b'; smState.smPage = 1;
+  document.getElementById('sm-search-input').value = '';
+  const badge = document.getElementById('sm-badge');
+  badge.textContent = 'วันที่อ่านไม่ได้'; badge.style.background = '#f59e0b22'; badge.style.color = '#f59e0b';
+  document.getElementById('sm-title').textContent = 'รายการที่วันที่ได้มาอ่านไม่ได้ (ไม่นับในกราฟปีงบประมาณ)';
+  document.getElementById('sm-count').textContent = '...';
+  document.getElementById('sm-subtitle').textContent = 'กำลังโหลด...';
+  document.getElementById('status-overlay').classList.add('show');
+  await ensureAllItemsLoaded();
+  smState.smRows = collectRowsByPredicate((it, headers) => {
+    const dk = headers.findIndex(isAcquireDateCol);
+    if(dk < 0) return false;
+    const raw = String(it.data?.[headers[dk]] ?? '').trim();
+    if(!raw) return false;
+    return getFiscalYear(raw) === null;
+  });
+  smState.reopenFn = () => openInvalidDatesModal();
+  renderSmTable();
+}
+
+async function exportDashboardPDF(){
+  if(!S.dashStats){ toast('ยังไม่มีข้อมูล Dashboard','error'); return; }
+  showLoading(true);
+  try {
+    if(!S.dashExtra){ await ensureAllItemsLoaded(); S.dashExtra = computeExtraDashStats(); }
+    const st = S.dashStats, ex = S.dashExtra;
+    const grandTotal = st.totalItems||0;
+    const useRach = (st.statusSummary['ใช้ราชการได้'])||0;
+    const DISPOSED = ['จำหน่าย','จำหน่ายแล้ว','ในระบบจำหน่ายแล้ว'];
+    const disposed = DISPOSED.reduce((s,k)=>s+(st.statusSummary[k]||0),0);
+    const today = new Date().toLocaleDateString('th-TH');
+
+    const overviewRows = [
+      ['ประเภทพัสดุ', String(st.totalSheets)],
+      ['รายการทั้งหมด', grandTotal.toLocaleString()],
+      ['ใช้ราชการได้', useRach.toLocaleString()],
+      ['จำหน่ายแล้ว', disposed.toLocaleString()],
+      ['ใกล้/หมดอายุ (รวม)', (ex.expiredCount+ex.expiringSoonCount).toLocaleString()],
+      ['— หมดอายุแล้ว', ex.expiredCount.toLocaleString()],
+      ['— ใกล้หมดอายุ (≤1 ปี)', ex.expiringSoonCount.toLocaleString()],
+      ['มูลค่ารวม (มูลค่าการได้มา)', formatBaht(ex.totalValue)],
+    ];
+    const statusRows = Object.entries(st.statusSummary).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[k, v.toLocaleString()]);
+    const catRows = st.sheetStats.filter(s=>s.count>0).sort((a,b)=>b.count-a.count).map(s=>[s.name, s.count.toLocaleString()]);
+    const deptRows = ex.deptList.map(d=>[d.name, d.count.toLocaleString()]);
+    const fyRows = ex.fyList.map(f=>['ปีงบประมาณ '+f.fy, f.count.toLocaleString()]);
+    const valRows = ex.valueByCat.map(v=>[v.name, formatBaht(v.value)]);
+
+    const section = (title, rows, headLabel, valLabel) => rows.length ? `
+      <h3>${escHtml(title)}</h3>
+      <table><thead><tr><th>${escHtml(headLabel)}</th><th>${escHtml(valLabel)}</th></tr></thead>
+      <tbody>${rows.map(r=>`<tr><td>${escHtml(String(r[0]))}</td><td>${escHtml(String(r[1]))}</td></tr>`).join('')}</tbody></table>` : '';
+
+    const win = window.open('','_blank');
+    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>รายงานสรุป Dashboard</title><style>
+      body{font-family:'Sarabun',sans-serif;font-size:12px;padding:24px;color:#1e293b}
+      h2{font-size:18px;margin-bottom:4px}
+      h3{font-size:13px;margin:18px 0 6px;color:#1a56db}
+      .sub{color:#666;font-size:11px;margin-bottom:14px}
+      table{width:100%;border-collapse:collapse;margin-bottom:10px}
+      th{background:#1a56db;color:#fff;padding:6px 10px;text-align:left;font-size:11px}
+      td{padding:5px 10px;border-bottom:1px solid #eee;font-size:11px}
+      tr:nth-child(even){background:#f8fafc}
+      @media print{body{padding:0}}
+    </style></head><body>
+      <h2>รายงานสรุป Dashboard — รายการพัสดุแผนกบริการเครื่องมือแพทย์</h2>
+      <div class="sub">วันที่ออกรายงาน: ${today}</div>
+      ${section('ภาพรวม', overviewRows, 'รายการ', 'จำนวน')}
+      ${section('สรุปสถานะพัสดุ', statusRows, 'สถานะ', 'จำนวน')}
+      ${section('จำนวนพัสดุแต่ละประเภท', catRows, 'ประเภทพัสดุ', 'จำนวน')}
+      ${section('มูลค่าพัสดุแต่ละประเภท', valRows, 'ประเภทพัสดุ', 'มูลค่า')}
+      ${section('จำนวนพัสดุแยกตามแผนก', deptRows, 'แผนก', 'จำนวน')}
+      ${section('จำนวนพัสดุที่ได้มาแยกตามปีงบประมาณ', fyRows, 'ปีงบประมาณ', 'จำนวน')}
+      <script>window.onload=()=>window.print()<\/script>
+    </body></html>`);
+    win.document.close();
+  } catch(e){ toast('ส่งออกไม่สำเร็จ: '+e.message,'error'); }
+  finally { showLoading(false); }
+}
+
 function renderDonut(sm){
   const mainEntries = Object.entries(sm).filter(([k])=>k.trim()).sort((a,b)=>b[1]-a[1]);
   const total = mainEntries.reduce((s,[,v])=>s+v,0);
@@ -1012,7 +1443,7 @@ function renderDonut(sm){
     paths+=`<path class="donut-slice" d="M${xi1},${yi1} L${x1},${y1} A${r},${r} 0 ${lg} 1 ${x2},${y2} L${xi2},${yi2} A${inn},${inn} 0 ${lg} 0 ${xi1},${yi1}" fill="${c}" opacity=".9" onclick="openStatusModal('${safeLabel}','${c}')" title="${escHtml(label)}: ${val} รายการ"/>`;
     start=end;
   });
-  svg.innerHTML=paths+`<text x="70" y="70" text-anchor="middle" dominant-baseline="middle" font-size="20" font-weight="700" fill="#1e293b">${total.toLocaleString()}</text><text x="70" y="86" text-anchor="middle" font-size="10" fill="#64748b">รายการ</text>`;
+  svg.innerHTML=paths+`<text x="70" y="70" text-anchor="middle" dominant-baseline="middle" font-size="20" font-weight="700" style="fill:var(--text)">${total.toLocaleString()}</text><text x="70" y="86" text-anchor="middle" font-size="10" style="fill:var(--text-muted)">รายการ</text>`;
   document.getElementById('donut-legend').innerHTML = mainEntries.slice(0,8).map(([label,val],i)=>`
     <div class="legend-item" onclick="openStatusModal('${escHtml(esc(label))}','${COLORS[i%COLORS.length]}')" title="คลิกดูรายการสถานะ: ${escHtml(label)}">
       <div class="legend-dot" style="background:${COLORS[i%COLORS.length]}"></div>
@@ -1122,7 +1553,7 @@ function renderTableBody(headers, rawQ){
 
   document.getElementById('table-body').innerHTML = pageRows.length ? pageRows.map((it,ri)=>{
     return `<tr>
-      <td style="color:var(--text-muted);font-size:11px;font-weight:600;background:#f8fafc">${start+ri+1}</td>
+      <td style="color:var(--text-muted);font-size:11px;font-weight:600;background:var(--thead-bg)">${start+ri+1}</td>
       ${headers.map((h,ci)=>{
         const val = (it.data && it.data[h] !== undefined && it.data[h] !== null) ? String(it.data[h]) : '';
 
@@ -1393,7 +1824,7 @@ async function confirmDelete(){
 
 async function invalidate(){
   if(S.currentCat){ delete S.allItems[S.currentCat.id]; }
-  S.dashStats = null;
+  S.dashStats = null; S.dashExtra = null;
   const { data } = await sb.from('categories').select('*').order('display_order').order('name');
   S.categories = data || [];
   buildSidebarNav();
@@ -1726,7 +2157,7 @@ function csvSafe(v){
 }
 
 async function refreshData(){
-  S.allItems = {}; S.dashStats = null;
+  S.allItems = {}; S.dashStats = null; S.dashExtra = null;
   const { data } = await sb.from('categories').select('*').order('display_order').order('name');
   S.categories = data || []; buildSidebarNav();
   toast('รีเฟรชแล้ว','success');
@@ -1745,7 +2176,7 @@ function toast(msg, type=''){
 function esc(s){ return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
 function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-let smState={statusFilter:'',color:'#2563eb',smPage:1,smPS:50,smRows:[]};
+let smState={statusFilter:'',color:'#2563eb',smPage:1,smPS:50,smRows:[],reopenFn:null};
 
 async function ensureAllItemsLoaded(){
   const missing = S.categories.filter(c => !S.allItems[c.id]);
@@ -1766,7 +2197,9 @@ async function openStatusModal(statusLabel, color){
   document.getElementById('sm-subtitle').textContent = 'กำลังโหลด...';
   document.getElementById('status-overlay').classList.add('show');
   await ensureAllItemsLoaded();
-  collectSmRows(statusLabel); renderSmTable();
+  collectSmRows(statusLabel);
+  smState.reopenFn = () => openStatusModal(statusLabel, color);
+  renderSmTable();
 }
 
 function collectSmRows(statusLabel){
@@ -1799,19 +2232,21 @@ function renderSmTable(){
     document.getElementById('sm-subtitle').textContent = 'รวม '+new Set(smState.smRows.map(r=>r.sheetName)).size+' ประเภท';
   }
 
-  const baseHeaders = pageRows[0]?.headers || smState.smRows[0]?.headers || [];
-  const skHead = baseHeaders.findIndex(isStatusCol);
-  const { remainIdx: smRemainIdx, lifespanIdx: smLsIdx, dateIdx: smDtIdx } = getLifeCalcIndices(baseHeaders);
+  // คอลัมน์ context เพิ่มเติม ขึ้นกับชนิดของหน้าต่างที่เปิดอยู่ — ใช้คอลัมน์แบบ normalize
+  // (ตรวจจับตามชื่อ/ประเภทฟิลด์ ไม่ใช่ตำแหน่งคอลัมน์ดิบ) เพราะแต่ละประเภทพัสดุมีชื่อ/ลำดับคอลัมน์ไม่เหมือนกัน
+  const ctx = smState.statusFilter === '__FISCAL_YEAR__' ? { label: 'วันที่ได้มา', key: 'acqdate' }
+            : smState.statusFilter === '__INVALID_DATE__' ? { label: 'ค่าที่บันทึกไว้ (อ่านไม่ได้)', key: 'invaliddate' }
+            : smState.statusFilter === '__EXPIRING__' ? { label: 'อายุคงเหลือ', key: 'remain' }
+            : null;
 
   document.getElementById('sm-thead').innerHTML = `<tr>
-    <th style="width:40px;position:sticky;top:0;background:#f8fafc;z-index:25;border-bottom:2px solid var(--border);padding:10px 12px;font-size:12px;font-weight:700;color:var(--text-muted)">#</th>
-    <th style="position:sticky;top:0;background:#f8fafc;z-index:20;border-bottom:2px solid var(--border);padding:10px 14px;font-size:12px;font-weight:700;color:var(--text-muted);white-space:nowrap;min-width:100px">ประเภท/ชีท</th>
-    ${baseHeaders.map((h,i)=>{
-      const isStatus = i===skHead;
-      const isRemain = i===smRemainIdx;
-      return `<th style="position:sticky;top:0;background:${isStatus?'#f0fdf4':isRemain?'#f0fdf4':'#f8fafc'};z-index:20;border-bottom:2px solid ${isStatus?'#10b981':isRemain?'#6ee7b7':'var(--border)'};padding:10px 14px;font-size:12px;font-weight:700;color:${isStatus?'#059669':isRemain?'#059669':'var(--text-muted)'};white-space:nowrap;min-width:100px">${escHtml(h)}${isRemain?' <i class="fas fa-magic" style="font-size:9px;opacity:.6"></i>':''}</th>`;
-    }).join('')}
-    <th style="position:sticky;top:0;background:#f8fafc;z-index:20;border-bottom:2px solid var(--border);padding:10px 14px;font-size:12px;font-weight:700;color:var(--text-muted);white-space:nowrap;width:60px">แก้ไข</th>
+    <th style="width:40px;position:sticky;top:0;background:var(--thead-bg);z-index:25;border-bottom:2px solid var(--border);padding:10px 12px;font-size:12px;font-weight:700;color:var(--text-muted)">#</th>
+    <th style="position:sticky;top:0;background:var(--thead-bg);z-index:20;border-bottom:2px solid var(--border);padding:10px 14px;font-size:12px;font-weight:700;color:var(--text-muted);white-space:nowrap;min-width:120px">ประเภท/ชีท</th>
+    <th style="position:sticky;top:0;background:var(--thead-bg);z-index:20;border-bottom:2px solid var(--border);padding:10px 14px;font-size:12px;font-weight:700;color:var(--text-muted);white-space:nowrap;min-width:140px">ยี่ห้อ/รุ่น</th>
+    <th style="position:sticky;top:0;background:var(--thead-bg);z-index:20;border-bottom:2px solid var(--border);padding:10px 14px;font-size:12px;font-weight:700;color:var(--text-muted);white-space:nowrap;min-width:120px">ใช้ที่แผนก</th>
+    <th style="position:sticky;top:0;background:var(--primary-light);z-index:20;border-bottom:2px solid #10b981;padding:10px 14px;font-size:12px;font-weight:700;color:#059669;white-space:nowrap;min-width:130px">สถานะ</th>
+    ${ctx ? `<th style="position:sticky;top:0;background:var(--primary-light);z-index:20;border-bottom:2px solid #6ee7b7;padding:10px 14px;font-size:12px;font-weight:700;color:#059669;white-space:nowrap;min-width:150px">${escHtml(ctx.label)}</th>` : ''}
+    <th style="position:sticky;top:0;background:var(--thead-bg);z-index:20;border-bottom:2px solid var(--border);padding:10px 14px;font-size:12px;font-weight:700;color:var(--text-muted);white-space:nowrap;width:60px">แก้ไข</th>
   </tr>`;
 
   if(!pageRows.length){
@@ -1819,35 +2254,55 @@ function renderSmTable(){
   } else {
     document.getElementById('sm-tbody').innerHTML = pageRows.map(({item, sheetName, headers: hdrs, catId}, ri)=>{
       const sk = hdrs.findIndex(isStatusCol);
+      const dk = hdrs.findIndex(isDeptCol);
+      const brandIdx = hdrs.indexOf('ยี่ห้อ');
+      const modelIdx = hdrs.indexOf('รุ่น');
       const { remainIdx: rIdx, lifespanIdx: lsIdx, dateIdx: dtIdx } = getLifeCalcIndices(hdrs);
-      const cells = hdrs.map((h,ci)=>{
-        let val = item.data?.[h] === undefined ? '' : String(item.data[h]);
-        if(ci === sk){
-          val = normalizeStatus(val);
-          if(val) return `<td style="padding:9px 14px;white-space:nowrap"><span class="status-badge ${getStCls(val)}">${escHtml(val)}</span></td>`;
-          return `<td style="padding:9px 14px;white-space:nowrap"><span style="color:var(--warning);font-size:11px;margin-right:6px">ไม่ระบุ</span></td>`;
-        }
-        if(ci === rIdx && lsIdx >= 0 && dtIdx >= 0){
-          const dateVal3 = String(item.data?.[hdrs[dtIdx]]  ?? '').trim();
-          const lsVal3   = String(item.data?.[hdrs[lsIdx]]  ?? '').trim();
-          if(!dateVal3 || !lsVal3){
-            return `<td style="padding:9px 14px;color:var(--text-muted);font-size:11px" title="ไม่มีข้อมูลครบ">—</td>`;
+
+      const brand = brandIdx>=0 ? String(item.data?.[hdrs[brandIdx]]||'').trim() : '';
+      const model = modelIdx>=0 ? String(item.data?.[hdrs[modelIdx]]||'').trim() : '';
+      const brandModel = [brand, model].filter(Boolean).join(' / ');
+      const deptVal = dk>=0 ? String(item.data?.[hdrs[dk]]||'').trim() : '';
+
+      let statusCell;
+      if(sk>=0){
+        const sv = normalizeStatus(item.data?.[hdrs[sk]]);
+        statusCell = sv ? `<span class="status-badge ${getStCls(sv)}">${escHtml(sv)}</span>` : `<span style="color:var(--warning);font-size:11px">ไม่ระบุ</span>`;
+      } else statusCell = '<span style="color:var(--text-muted)">—</span>';
+
+      let ctxCell = '';
+      if(ctx){
+        if(ctx.key === 'acqdate'){
+          const dv = dtIdx>=0 ? String(item.data?.[hdrs[dtIdx]]||'').trim() : '';
+          ctxCell = `<td style="padding:9px 14px;white-space:nowrap">${dv?escHtml(dv):'<span style="color:var(--text-muted)">—</span>'}</td>`;
+        } else if(ctx.key === 'invaliddate'){
+          const adk = hdrs.findIndex(isAcquireDateCol);
+          const dv = adk>=0 ? String(item.data?.[hdrs[adk]]||'').trim() : '';
+          ctxCell = `<td style="padding:9px 14px;background:#fff1f2;color:#b91c1c;font-weight:600;white-space:nowrap" title="ค่านี้ไม่ใช่รูปแบบวันที่ที่ระบบรู้จัก"><i class="fas fa-triangle-exclamation" style="margin-right:4px"></i>${escHtml(dv)}</td>`;
+        } else if(ctx.key === 'remain'){
+          let inner = '<span style="color:var(--text-muted)">—</span>';
+          if(rIdx>=0 && lsIdx>=0 && dtIdx>=0){
+            const dv = String(item.data?.[hdrs[dtIdx]] ?? '').trim();
+            const lv = String(item.data?.[hdrs[lsIdx]] ?? '').trim();
+            const res = (dv && lv) ? calcRemainingLife(dv, lv) : null;
+            if(res){
+              let cs = 'background:#f0fdf4;color:#065f46;font-weight:600';
+              if(res.totalMonths <= 0) cs='background:#fff1f2;color:#b91c1c;font-weight:600';
+              else if(res.totalMonths <= 12) cs='background:#fffbeb;color:#b45309;font-weight:600';
+              ctxCell = `<td style="padding:9px 14px;${cs};white-space:nowrap"><i class="fas fa-magic" style="font-size:9px;margin-right:3px;opacity:.5"></i>${escHtml(res.text)}</td>`;
+            }
           }
-          const res = calcRemainingLife(dateVal3, lsVal3);
-          if(res){
-            let cs = 'background:#f0fdf4;color:#065f46;font-weight:600';
-            if(res.totalMonths <= 0) cs='background:#fff1f2;color:#b91c1c;font-weight:600';
-            else if(res.totalMonths <= 12) cs='background:#fffbeb;color:#b45309;font-weight:600';
-            return `<td style="padding:9px 14px;${cs};white-space:nowrap" title="คำนวณจาก: ${escHtml(dateVal3)} + ${escHtml(lsVal3)} ปี"><i class="fas fa-magic" style="font-size:9px;margin-right:3px;opacity:.5"></i>${escHtml(res.text)}</td>`;
-          }
-          return `<td style="padding:9px 14px;color:var(--text-muted);font-size:11px" title="รูปแบบวันที่ไม่รู้จัก: ${escHtml(dateVal3)}"><i class="fas fa-question-circle" style="margin-right:3px;color:var(--warning)"></i>${escHtml(val)}</td>`;
+          if(!ctxCell) ctxCell = `<td style="padding:9px 14px">${inner}</td>`;
         }
-        return `<td style="padding:9px 14px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escHtml(val)}">${escHtml(val)}</td>`;
-      }).join('');
-      return `<tr style="border-bottom:1px solid #f1f5f9">
+      }
+
+      return `<tr style="border-bottom:1px solid var(--border)">
         <td style="padding:9px 12px;color:var(--text-muted);font-size:11px;font-weight:600;white-space:nowrap">${start+ri+1}</td>
         <td style="padding:9px 14px;white-space:nowrap"><span class="sm-sheet-tag">${escHtml(sheetName)}</span></td>
-        ${cells}
+        <td style="padding:9px 14px;white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis" title="${escHtml(brandModel)}">${brandModel?escHtml(brandModel):'<span style="color:var(--text-muted)">—</span>'}</td>
+        <td style="padding:9px 14px;white-space:nowrap;max-width:180px;overflow:hidden;text-overflow:ellipsis" title="${escHtml(deptVal)}">${deptVal?escHtml(deptVal):'<span style="color:var(--text-muted)">—</span>'}</td>
+        <td style="padding:9px 14px;white-space:nowrap">${statusCell}</td>
+        ${ctxCell}
         <td style="padding:9px 10px;white-space:nowrap"><button class="btn btn-outline btn-sm btn-icon" onclick="smEdit(${catId},${item.id})" title="แก้ไขรายการนี้"><i class="fas fa-edit"></i></button></td>
       </tr>`;
     }).join('');
@@ -1868,8 +2323,7 @@ function renderSmTable(){
 function smEdit(catId, itemId){
   const cat = S.categories.find(c => c.id === catId); if(!cat) return;
   S.currentCat = cat;
-  const sf = smState.statusFilter, sc = smState.color;
-  S._smReopen = ()=>{ if(sf === '__NO_STATUS__') openNoStatusModal(); else if(sf === '__ALL_SHEETS__') openSheetListModal(); else openStatusModal(sf, sc); };
+  S._smReopen = smState.reopenFn || (()=>{});
   requirePin('แก้ไขรายการ', ()=>_openEditModal(itemId));
 }
 
@@ -1887,15 +2341,28 @@ document.getElementById('status-overlay').addEventListener('click', e => { if(e.
 
 function exportSmCSV(){
   if(!smState.smRows.length) return;
-  const baseHeaders = smState.smRows[0].headers;
-  const { remainIdx, lifespanIdx, dateIdx } = getLifeCalcIndices(baseHeaders);
-  const headers = ['ประเภท/ชีท', ...baseHeaders];
-  let csv = '﻿' + headers.join(',') + '\n';
-  smState.smRows.forEach(({item, sheetName, headers: hdrs}) => {
-    const arr = rowToArr(item, hdrs);
-    const { remainIdx: ri, lifespanIdx: li, dateIdx: di } = getLifeCalcIndices(hdrs);
-    if(ri >= 0 && li >= 0 && di >= 0){ const res = calcRemainingLife(arr[di], arr[li]); if(res) arr[ri] = res.text; }
-    csv += [sheetName, ...arr].map(v => '"'+csvSafe(v).replace(/"/g,'""')+'"').join(',') + '\n';
+  // จัดกลุ่มตามประเภทพัสดุก่อน export — แต่ละประเภทมีชื่อ/ลำดับคอลัมน์ไม่เหมือนกัน
+  // ถ้ารวมเป็นตารางเดียวโดยใช้ header ของแถวแรก จะทำให้คอลัมน์/ข้อมูลของประเภทอื่นเลื่อนผิดตำแหน่ง
+  const groups = {};
+  const order = [];
+  smState.smRows.forEach(row => {
+    if(!groups[row.sheetName]){ groups[row.sheetName] = []; order.push(row.sheetName); }
+    groups[row.sheetName].push(row);
+  });
+
+  let csv = '﻿';
+  order.forEach(name => {
+    const rows = groups[name];
+    const headers = rows[0].headers;
+    csv += '"'+csvSafe('=== '+name+' ('+rows.length+' รายการ) ===').replace(/"/g,'""')+'"\n';
+    csv += headers.map(h => '"'+csvSafe(h).replace(/"/g,'""')+'"').join(',') + '\n';
+    rows.forEach(({item, headers: hdrs}) => {
+      const arr = rowToArr(item, hdrs);
+      const { remainIdx: ri, lifespanIdx: li, dateIdx: di } = getLifeCalcIndices(hdrs);
+      if(ri >= 0 && li >= 0 && di >= 0){ const res = calcRemainingLife(arr[di], arr[li]); if(res) arr[ri] = res.text; }
+      csv += arr.map(v => '"'+csvSafe(v).replace(/"/g,'""')+'"').join(',') + '\n';
+    });
+    csv += '\n';
   });
   dlBlob(new Blob([csv],{type:'text/csv;charset=utf-8'}), (smState.statusFilter==='__ALL_SHEETS__'?'all':smState.statusFilter)+'.csv');
 }
@@ -1911,6 +2378,7 @@ async function openSheetListModal(){
   await ensureAllItemsLoaded();
   smState.smRows = [];
   S.categories.forEach(cat => { (S.allItems[cat.id]||[]).forEach(it => smState.smRows.push({ item: it, sheetName: cat.name, headers: cat.headers||[], catId: cat.id })); });
+  smState.reopenFn = () => openSheetListModal();
   renderSmTable();
 }
 async function openAllItemsModal(){ await openSheetListModal(); }
@@ -1929,6 +2397,7 @@ async function openMultiStatusModal(statusList, label, color){
     const sk = headers.findIndex(isStatusCol);
     items.forEach(it=>{ const sv = sk>=0 ? normalizeStatus(it.data?.[headers[sk]]) : ''; if(statusList.includes(sv)) smState.smRows.push({ item: it, sheetName: cat.name, headers, catId: cat.id }); });
   });
+  smState.reopenFn = () => openMultiStatusModal(statusList, label, color);
   renderSmTable();
 }
 
@@ -1946,6 +2415,7 @@ async function openNoStatusModal(){
     const sk=headers.findIndex(isStatusCol); if(sk<0) return;
     items.forEach(it=>{ const sv=normalizeStatus(it.data?.[headers[sk]]); if(!sv||sv==='ไม่ระบุสถานะ') smState.smRows.push({item:it, sheetName:cat.name, headers, catId:cat.id}); });
   });
+  smState.reopenFn = () => openNoStatusModal();
   renderSmTable();
 }
 
