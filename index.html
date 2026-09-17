@@ -428,6 +428,20 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
             <div id="chart-fiscal-year-warning" style="display:none;font-size:12px;color:var(--warning);background:#fef3c722;border:1px solid #fde68a;border-radius:8px;padding:8px 12px;margin-bottom:12px"></div>
             <div class="bar-chart" id="chart-fiscal-year"><div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px 0">กำลังคำนวณ...</div></div>
           </div>
+          <div class="chart-card" style="margin-bottom:16px" id="loan-tracker-card">
+            <div class="chart-title"><i class="fas fa-right-left" style="color:#0891b2"></i> อุปกรณ์ยืม-คืน <span style="font-size:11px;color:var(--text-muted);font-weight:400;margin-left:6px">คลิกแท่งกราฟเพื่อดูรายการ</span></div>
+            <div class="bar-chart" id="chart-loan-tracker"><div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px 0">กำลังคำนวณ...</div></div>
+          </div>
+          <div class="chart-grid">
+            <div class="chart-card">
+              <div class="chart-title"><i class="fas fa-hand-holding-dollar" style="color:#059669"></i> แหล่งที่มาของงบประมาณ</div>
+              <div class="bar-chart" id="chart-budget-source"><div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px 0">กำลังคำนวณ...</div></div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-title"><i class="fas fa-file-contract" style="color:#7c3aed"></i> วิธีจัดซื้อจัดจ้าง</div>
+              <div class="bar-chart" id="chart-procurement-method"><div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px 0">กำลังคำนวณ...</div></div>
+            </div>
+          </div>
           <div class="chart-card" style="margin-bottom:16px">
             <div class="chart-title"><i class="fas fa-th-large" style="color:var(--info)"></i> รายการพัสดุทั้งหมด <span style="font-size:12px;color:var(--text-muted);font-weight:400;margin-left:6px">คลิกเพื่อดูรายการ</span></div>
             <div class="sheet-grid" id="sheet-grid"></div>
@@ -774,6 +788,9 @@ function getFiscalYear(dateStr){
 
 /** คอลัมน์มูลค่าการได้มา (สำหรับรวมมูลค่าทรัพย์สิน) */
 function isValueCol(h){ return normH(h) === 'มูลค่าการได้มา'; }
+function isBudgetSourceCol(h){ return normH(h) === 'ชื่องบประมาณ'; }
+function isProcurementMethodCol(h){ return normH(h) === 'วิธีจัดซื้อจัดจ้าง'; }
+function isLoanUnitCol(h){ return normH(h) === 'หน่วยที่รับไปใช้งาน'; }
 
 function parseNumber(v){
   if(v === undefined || v === null) return 0;
@@ -1143,6 +1160,10 @@ function computeExtraDashStats(){
   const valueByCatMap = [];
   const deptCounts = {};
   const fyCounts = {};
+  const budgetSourceCounts = {};
+  const procurementMethodCounts = {};
+  const loanCats = [];
+  const catStatusBreakdown = {};
   let expiredCount = 0, expiringSoonCount = 0, invalidDateCount = 0;
 
   S.categories.forEach(cat => {
@@ -1152,7 +1173,13 @@ function computeExtraDashStats(){
     const deptIdx = headers.findIndex(isDeptCol);
     const valueIdx = headers.findIndex(isValueCol);
     const acqDateIdx = headers.findIndex(isAcquireDateCol);
+    const budgetIdx = headers.findIndex(isBudgetSourceCol);
+    const methodIdx = headers.findIndex(isProcurementMethodCol);
+    const loanIdx = headers.findIndex(isLoanUnitCol);
+    const sk = headers.findIndex(isStatusCol);
     let catValue = 0;
+    let loanTotal = 0, loanOut = 0;
+    const statusCounts = {};
 
     items.forEach(it => {
       if(valueIdx >= 0){
@@ -1182,16 +1209,35 @@ function computeExtraDashStats(){
           else invalidDateCount++;
         }
       }
+      if(budgetIdx >= 0){
+        const b = String(it.data?.[headers[budgetIdx]] || '').trim();
+        if(b) budgetSourceCounts[b] = (budgetSourceCounts[b]||0) + 1;
+      }
+      if(methodIdx >= 0){
+        const m = String(it.data?.[headers[methodIdx]] || '').trim();
+        if(m) procurementMethodCounts[m] = (procurementMethodCounts[m]||0) + 1;
+      }
+      if(loanIdx >= 0){
+        loanTotal++;
+        if(String(it.data?.[headers[loanIdx]] || '').trim()) loanOut++;
+      }
+      const sv = sk>=0 ? (normalizeStatus(it.data?.[headers[sk]]) || 'ไม่ระบุ') : 'ไม่ระบุ';
+      statusCounts[sv] = (statusCounts[sv]||0) + 1;
     });
 
     if(valueIdx >= 0 && catValue > 0) valueByCatMap.push({ id: cat.id, name: cat.name, value: catValue });
+    if(loanIdx >= 0 && loanTotal > 0) loanCats.push({ id: cat.id, name: cat.name, total: loanTotal, out: loanOut });
+    if(items.length) catStatusBreakdown[cat.id] = statusCounts;
   });
 
   const deptList = Object.entries(deptCounts).map(([name,count])=>({name,count})).sort((a,b)=>b.count-a.count);
   const fyList = Object.entries(fyCounts).map(([fy,count])=>({fy:parseInt(fy,10),count})).sort((a,b)=>a.fy-b.fy);
+  const budgetSourceList = Object.entries(budgetSourceCounts).map(([name,count])=>({name,count})).sort((a,b)=>b.count-a.count);
+  const procurementMethodList = Object.entries(procurementMethodCounts).map(([name,count])=>({name,count})).sort((a,b)=>b.count-a.count);
+  loanCats.sort((a,b)=>b.total-a.total);
   valueByCatMap.sort((a,b)=>b.value-a.value);
 
-  return { totalValue, valueByCat: valueByCatMap, deptList, fyList, expiredCount, expiringSoonCount, invalidDateCount };
+  return { totalValue, valueByCat: valueByCatMap, deptList, fyList, expiredCount, expiringSoonCount, invalidDateCount, budgetSourceList, procurementMethodList, loanCats, catStatusBreakdown };
 }
 
 function renderExtraDashCards(extra){
@@ -1220,7 +1266,41 @@ function renderExtraDashCards(extra){
   }
 }
 
+/** อัปเกรดกราฟ "จำนวนพัสดุแต่ละประเภท" ให้แยกเป็นช่วงสีตามสถานะ (เรียกหลังโหลดข้อมูลทุกรายการเสร็จ)
+ *  สีอิงตาม buildStatusColorMap เดียวกับ donut chart เพื่อให้สีตรงกันเสมอ
+ *  ไม่แก้ fast-path เดิมใน renderDashboard() — ฟังก์ชันนี้แค่เขียนทับ #chart-sheets ทีหลังเท่านั้น */
+function renderCategoryStatusChart(extra){
+  const el = document.getElementById('chart-sheets');
+  if(!el || !S.dashStats) return;
+  const breakdown = extra.catStatusBreakdown || {};
+  const colorMap = buildStatusColorMap(S.dashStats.statusSummary);
+  const rankOrder = Object.keys(colorMap);
+  const GRAY = '#64748b';
+
+  const cats = S.dashStats.sheetStats.filter(s=>s.count>0).sort((a,b)=>b.count-a.count).slice(0,12);
+  const maxC = Math.max(...cats.map(s=>s.count), 1);
+
+  el.innerHTML = cats.map(s => {
+    const counts = breakdown[s.id] || {};
+    const ordered = [...rankOrder.filter(k=>counts[k]), ...Object.keys(counts).filter(k=>!rankOrder.includes(k))];
+    const segmentsHtml = ordered.length ? ordered.map(status => {
+      const cnt = counts[status];
+      const pct = cnt/s.count*100;
+      const color = colorMap[status] || GRAY;
+      const showLabel = pct > 14;
+      return `<div style="width:${pct}%;height:100%;background:${color};display:flex;align-items:center;justify-content:center;min-width:1px" title="${escHtml(status)}: ${cnt} รายการ">${showLabel?`<span style="color:#fff;font-size:10px;font-weight:700">${cnt}</span>`:''}</div>`;
+    }).join('') : `<div style="width:100%;height:100%;background:${COLORS[0]}"></div>`;
+
+    return `<div class="bar-item" onclick="showCategoryById(${s.id})" title="คลิกดูรายการ: ${escHtml(s.name)}">
+      <div class="bar-label" title="${escHtml(s.name)}">${escHtml(s.name)}</div>
+      <div class="bar-track"><div style="display:flex;height:100%;border-radius:20px;overflow:hidden;width:${Math.max(s.count/maxC*100,2)}%">${segmentsHtml}</div></div>
+      <span style="width:38px;text-align:right;font-size:11px;font-weight:700;color:var(--text-muted);flex-shrink:0">${s.count.toLocaleString()}</span>
+    </div>`;
+  }).join('');
+}
+
 function renderExtraDashCharts(extra){
+  renderCategoryStatusChart(extra);
   const warnEl = document.getElementById('chart-fiscal-year-warning');
   if(warnEl){
     if(extra.invalidDateCount > 0){
@@ -1266,6 +1346,53 @@ function renderExtraDashCharts(extra){
         <div class="bar-item" onclick="openFiscalYearModal(${f.fy})" title="คลิกดูรายการปีงบประมาณ ${f.fy}">
           <div class="bar-label" title="ปีงบประมาณ ${f.fy}">ปีงบ ${f.fy}</div>
           <div class="bar-track"><div class="bar-fill" style="width:${Math.max(f.count/maxF*100,2)}%;background:${COLORS[i%COLORS.length]}"><span class="bar-val">${f.count}</span></div></div>
+        </div>`).join('');
+    }
+  }
+
+  const loanCard = document.getElementById('loan-tracker-card');
+  const loanEl = document.getElementById('chart-loan-tracker');
+  if(loanCard && loanEl){
+    if(!extra.loanCats.length){
+      loanCard.style.display = 'none';
+    } else {
+      loanCard.style.display = '';
+      const maxL = Math.max(...extra.loanCats.map(l=>l.total), 1);
+      loanEl.innerHTML = extra.loanCats.map((l,i)=>{
+        const pctOut = l.total ? l.out/l.total : 0;
+        const color = pctOut >= 1 ? '#ef4444' : pctOut >= 0.5 ? '#f59e0b' : '#10b981';
+        return `<div class="bar-item" onclick="openLoanCategoryModal(${l.id})" title="คลิกดูรายการ: ${escHtml(l.name)}">
+          <div class="bar-label" title="${escHtml(l.name)}">${escHtml(l.name)}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.max(l.total/maxL*100,2)}%;background:${color}"><span class="bar-val">${l.out}/${l.total} ยืมออก</span></div></div>
+        </div>`;
+      }).join('');
+    }
+  }
+
+  const budgetEl = document.getElementById('chart-budget-source');
+  if(budgetEl){
+    if(!extra.budgetSourceList.length){
+      budgetEl.innerHTML = '<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px 0">ไม่มีข้อมูลแหล่งงบประมาณ</div>';
+    } else {
+      const maxB = Math.max(...extra.budgetSourceList.map(b=>b.count), 1);
+      budgetEl.innerHTML = extra.budgetSourceList.slice(0,10).map((b,i)=>`
+        <div class="bar-item" onclick="openBudgetSourceModal('${escHtml(esc(b.name))}')" title="คลิกดูรายการ: ${escHtml(b.name)}">
+          <div class="bar-label" title="${escHtml(b.name)}">${escHtml(b.name)}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.max(b.count/maxB*100,2)}%;background:${COLORS[i%COLORS.length]}"><span class="bar-val">${b.count}</span></div></div>
+        </div>`).join('');
+    }
+  }
+
+  const methodEl = document.getElementById('chart-procurement-method');
+  if(methodEl){
+    if(!extra.procurementMethodList.length){
+      methodEl.innerHTML = '<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px 0">ไม่มีข้อมูลวิธีจัดซื้อ</div>';
+    } else {
+      const maxM = Math.max(...extra.procurementMethodList.map(m=>m.count), 1);
+      methodEl.innerHTML = extra.procurementMethodList.slice(0,10).map((m,i)=>`
+        <div class="bar-item" onclick="openProcurementMethodModal('${escHtml(esc(m.name))}')" title="คลิกดูรายการ: ${escHtml(m.name)}">
+          <div class="bar-label" title="${escHtml(m.name)}">${escHtml(m.name)}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.max(m.count/maxM*100,2)}%;background:${COLORS[i%COLORS.length]}"><span class="bar-val">${m.count}</span></div></div>
         </div>`).join('');
     }
   }
@@ -1368,6 +1495,60 @@ async function openInvalidDatesModal(){
   renderSmTable();
 }
 
+async function openLoanCategoryModal(catId){
+  const cat = S.categories.find(c => c.id === catId); if(!cat) return;
+  smState.statusFilter = '__LOAN__'; smState.color = '#0891b2'; smState.smPage = 1;
+  document.getElementById('sm-search-input').value = '';
+  const badge = document.getElementById('sm-badge');
+  badge.textContent = cat.name; badge.style.background = '#0891b222'; badge.style.color = '#0891b2';
+  document.getElementById('sm-title').textContent = 'สถานะยืม-คืน: '+cat.name;
+  document.getElementById('sm-count').textContent = '...';
+  document.getElementById('sm-subtitle').textContent = 'กำลังโหลด...';
+  document.getElementById('status-overlay').classList.add('show');
+  await ensureAllItemsLoaded();
+  smState.smRows = collectRowsByPredicate((it, headers, c) => c.id === catId);
+  smState.reopenFn = () => openLoanCategoryModal(catId);
+  renderSmTable();
+}
+
+async function openBudgetSourceModal(sourceName){
+  smState.statusFilter = '__BUDGET_SOURCE__'; smState.color = '#059669'; smState.smPage = 1;
+  document.getElementById('sm-search-input').value = '';
+  const badge = document.getElementById('sm-badge');
+  badge.textContent = sourceName; badge.style.background = '#05966922'; badge.style.color = '#059669';
+  document.getElementById('sm-title').textContent = 'แหล่งงบประมาณ: '+sourceName;
+  document.getElementById('sm-count').textContent = '...';
+  document.getElementById('sm-subtitle').textContent = 'กำลังโหลด...';
+  document.getElementById('status-overlay').classList.add('show');
+  await ensureAllItemsLoaded();
+  smState.smRows = collectRowsByPredicate((it, headers) => {
+    const bk = headers.findIndex(isBudgetSourceCol);
+    if(bk < 0) return false;
+    return String(it.data?.[headers[bk]] || '').trim() === sourceName;
+  });
+  smState.reopenFn = () => openBudgetSourceModal(sourceName);
+  renderSmTable();
+}
+
+async function openProcurementMethodModal(methodName){
+  smState.statusFilter = '__PROCUREMENT_METHOD__'; smState.color = '#7c3aed'; smState.smPage = 1;
+  document.getElementById('sm-search-input').value = '';
+  const badge = document.getElementById('sm-badge');
+  badge.textContent = methodName; badge.style.background = '#7c3aed22'; badge.style.color = '#7c3aed';
+  document.getElementById('sm-title').textContent = 'วิธีจัดซื้อจัดจ้าง: '+methodName;
+  document.getElementById('sm-count').textContent = '...';
+  document.getElementById('sm-subtitle').textContent = 'กำลังโหลด...';
+  document.getElementById('status-overlay').classList.add('show');
+  await ensureAllItemsLoaded();
+  smState.smRows = collectRowsByPredicate((it, headers) => {
+    const mk = headers.findIndex(isProcurementMethodCol);
+    if(mk < 0) return false;
+    return String(it.data?.[headers[mk]] || '').trim() === methodName;
+  });
+  smState.reopenFn = () => openProcurementMethodModal(methodName);
+  renderSmTable();
+}
+
 async function exportDashboardPDF(){
   if(!S.dashStats){ toast('ยังไม่มีข้อมูล Dashboard','error'); return; }
   showLoading(true);
@@ -1395,6 +1576,9 @@ async function exportDashboardPDF(){
     const deptRows = ex.deptList.map(d=>[d.name, d.count.toLocaleString()]);
     const fyRows = ex.fyList.map(f=>['ปีงบประมาณ '+f.fy, f.count.toLocaleString()]);
     const valRows = ex.valueByCat.map(v=>[v.name, formatBaht(v.value)]);
+    const budgetRows = ex.budgetSourceList.map(b=>[b.name, b.count.toLocaleString()]);
+    const methodRows = ex.procurementMethodList.map(m=>[m.name, m.count.toLocaleString()]);
+    const loanRows = ex.loanCats.map(l=>[l.name, l.out+' / '+l.total+' ยืมออก']);
 
     const section = (title, rows, headLabel, valLabel) => rows.length ? `
       <h3>${escHtml(title)}</h3>
@@ -1421,6 +1605,9 @@ async function exportDashboardPDF(){
       ${section('มูลค่าพัสดุแต่ละประเภท', valRows, 'ประเภทพัสดุ', 'มูลค่า')}
       ${section('จำนวนพัสดุแยกตามแผนก', deptRows, 'แผนก', 'จำนวน')}
       ${section('จำนวนพัสดุที่ได้มาแยกตามปีงบประมาณ', fyRows, 'ปีงบประมาณ', 'จำนวน')}
+      ${section('แหล่งที่มาของงบประมาณ', budgetRows, 'แหล่งงบประมาณ', 'จำนวน')}
+      ${section('วิธีจัดซื้อจัดจ้าง', methodRows, 'วิธีจัดซื้อจัดจ้าง', 'จำนวน')}
+      ${section('อุปกรณ์ยืม-คืน', loanRows, 'ประเภทพัสดุ', 'สถานะ')}
       <script>window.onload=()=>window.print()<\/script>
     </body></html>`);
     win.document.close();
@@ -1428,25 +1615,35 @@ async function exportDashboardPDF(){
   finally { showLoading(false); }
 }
 
+/** สร้าง map สถานะ->สี ให้ตรงกับลำดับเดียวกับที่ donut chart ใช้ (เรียงตามจำนวนมากไปน้อย)
+ *  ใช้ร่วมกันระหว่าง renderDonut และกราฟอื่นๆ ที่ต้องการสีสถานะให้ตรงกับ donut เสมอ */
+function buildStatusColorMap(statusSummary){
+  const mainEntries = Object.entries(statusSummary||{}).filter(([k])=>k.trim()).sort((a,b)=>b[1]-a[1]);
+  const map = {};
+  mainEntries.forEach(([label],i)=>{ map[label] = COLORS[i%COLORS.length]; });
+  return map;
+}
+
 function renderDonut(sm){
   const mainEntries = Object.entries(sm).filter(([k])=>k.trim()).sort((a,b)=>b[1]-a[1]);
   const total = mainEntries.reduce((s,[,v])=>s+v,0);
   const svg = document.getElementById('donut-svg');
   if(!total){ svg.innerHTML=''; document.getElementById('donut-legend').innerHTML='<div style="color:var(--text-muted);font-size:12px">ยังไม่มีข้อมูล</div>'; return; }
+  const colorMap = buildStatusColorMap(sm);
   const [cx,cy,r,inn]=[70,70,55,35]; let start=-Math.PI/2, paths='';
-  mainEntries.forEach(([label,val],i)=>{
+  mainEntries.forEach(([label,val])=>{
     const angle=val/total*Math.PI*2, end=start+angle;
     const[x1,y1,x2,y2]=[cx+r*Math.cos(start),cy+r*Math.sin(start),cx+r*Math.cos(end),cy+r*Math.sin(end)];
     const[xi1,yi1,xi2,yi2]=[cx+inn*Math.cos(start),cy+inn*Math.sin(start),cx+inn*Math.cos(end),cy+inn*Math.sin(end)];
-    const lg=angle>Math.PI?1:0, c=COLORS[i%COLORS.length];
+    const lg=angle>Math.PI?1:0, c=colorMap[label];
     const safeLabel=escHtml(esc(label));
     paths+=`<path class="donut-slice" d="M${xi1},${yi1} L${x1},${y1} A${r},${r} 0 ${lg} 1 ${x2},${y2} L${xi2},${yi2} A${inn},${inn} 0 ${lg} 0 ${xi1},${yi1}" fill="${c}" opacity=".9" onclick="openStatusModal('${safeLabel}','${c}')" title="${escHtml(label)}: ${val} รายการ"/>`;
     start=end;
   });
   svg.innerHTML=paths+`<text x="70" y="70" text-anchor="middle" dominant-baseline="middle" font-size="20" font-weight="700" style="fill:var(--text)">${total.toLocaleString()}</text><text x="70" y="86" text-anchor="middle" font-size="10" style="fill:var(--text-muted)">รายการ</text>`;
-  document.getElementById('donut-legend').innerHTML = mainEntries.slice(0,8).map(([label,val],i)=>`
-    <div class="legend-item" onclick="openStatusModal('${escHtml(esc(label))}','${COLORS[i%COLORS.length]}')" title="คลิกดูรายการสถานะ: ${escHtml(label)}">
-      <div class="legend-dot" style="background:${COLORS[i%COLORS.length]}"></div>
+  document.getElementById('donut-legend').innerHTML = mainEntries.slice(0,8).map(([label,val])=>`
+    <div class="legend-item" onclick="openStatusModal('${escHtml(esc(label))}','${colorMap[label]}')" title="คลิกดูรายการสถานะ: ${escHtml(label)}">
+      <div class="legend-dot" style="background:${colorMap[label]}"></div>
       <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(label)}</span>
       <strong>${val}</strong>
       <i class="fas fa-chevron-right" style="font-size:10px;color:var(--text-muted);margin-left:4px"></i>
@@ -2237,6 +2434,7 @@ function renderSmTable(){
   const ctx = smState.statusFilter === '__FISCAL_YEAR__' ? { label: 'วันที่ได้มา', key: 'acqdate' }
             : smState.statusFilter === '__INVALID_DATE__' ? { label: 'ค่าที่บันทึกไว้ (อ่านไม่ได้)', key: 'invaliddate' }
             : smState.statusFilter === '__EXPIRING__' ? { label: 'อายุคงเหลือ', key: 'remain' }
+            : smState.statusFilter === '__LOAN__' ? { label: 'สถานะยืม-คืน', key: 'loanunit' }
             : null;
 
   document.getElementById('sm-thead').innerHTML = `<tr>
@@ -2293,6 +2491,12 @@ function renderSmTable(){
             }
           }
           if(!ctxCell) ctxCell = `<td style="padding:9px 14px">${inner}</td>`;
+        } else if(ctx.key === 'loanunit'){
+          const lk = hdrs.findIndex(isLoanUnitCol);
+          const lv = lk>=0 ? String(item.data?.[hdrs[lk]]||'').trim() : '';
+          ctxCell = lv
+            ? `<td style="padding:9px 14px;background:#fef3c7;color:#92400e;font-weight:600;white-space:nowrap" title="กำลังถูกยืมออกไปใช้งาน"><i class="fas fa-right-left" style="margin-right:4px"></i>${escHtml(lv)}</td>`
+            : `<td style="padding:9px 14px;background:#dcfce7;color:#15803d;font-weight:600;white-space:nowrap"><i class="fas fa-check" style="margin-right:4px"></i>ว่าง พร้อมให้ยืม</td>`;
         }
       }
 
