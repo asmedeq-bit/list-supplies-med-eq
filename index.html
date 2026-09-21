@@ -394,7 +394,8 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
           </div>
         </div>
 
-        <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" id="btn-export-all" onclick="exportAllCategories()"><i class="fas fa-file-excel"></i> ส่งออกข้อมูลทั้งหมด (Excel)</button>
           <button class="btn btn-ghost btn-sm" onclick="exportDashboardPDF()"><i class="fas fa-file-pdf"></i> ส่งออกรายงานสรุป Dashboard</button>
         </div>
 
@@ -2343,6 +2344,56 @@ function exportData(type){
     win.document.close();
   }
 }
+
+/** ส่งออกข้อมูลทุกประเภทพัสดุในไฟล์ Excel เดียว — 1 ชีทต่อ 1 ประเภท
+ *  ใช้ S.allItems ที่โหลดแล้ว (ensureAllItemsLoaded) จึงไม่เพิ่มภาระ Supabase เกินความจำเป็น
+ *  แต่ละชีทคำนวณ "อายุการใช้งานคงเหลือ" ใหม่ล่าสุด เหมือนกับ exportData('xlsx') รายชีท */
+async function exportAllCategories(){
+  const btn = document.getElementById('btn-export-all');
+  if(btn){ btn.disabled = true; btn.style.opacity = '.6'; }
+  showLoading(true);
+  try{
+    await ensureAllItemsLoaded();
+    const wb = XLSX.utils.book_new();
+    const usedNames = {};
+    S.categories.forEach(cat => {
+      const headers = cat.headers || [];
+      const items = S.allItems[cat.id] || [];
+      const { remainIdx, lifespanIdx, dateIdx } = getLifeCalcIndices(headers);
+      const rows = items.map(it => {
+        const arr = rowToArr(it, headers);
+        if(remainIdx >= 0 && lifespanIdx >= 0 && dateIdx >= 0){
+          const res = calcRemainingLife(arr[dateIdx], arr[lifespanIdx]);
+          if(res) arr[remainIdx] = res.text;
+        }
+        return arr;
+      });
+      // ป้องกันสูตร Excel เช่นเดียวกับ exportData('csv')
+      const safeRows = rows.map(r => r.map(csvSafe));
+      const ws = XLSX.utils.aoa_to_sheet([headers, ...safeRows]);
+      // ชื่อชีท Excel ห้ามเกิน 31 ตัวอักษร และห้ามซ้ำ/มีอักขระต้องห้าม
+      let sheetName = String(cat.name || 'sheet').replace(/[\\\/\?\*\[\]:]/g, ' ').trim().substring(0,31) || 'sheet';
+      if(usedNames[sheetName] !== undefined){
+        usedNames[sheetName]++;
+        const suffix = ' ('+usedNames[sheetName]+')';
+        sheetName = sheetName.substring(0, 31 - suffix.length) + suffix;
+      } else {
+        usedNames[sheetName] = 0;
+      }
+      XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    });
+    const dateStr = new Date().toLocaleDateString('th-TH').replace(/\//g,'-');
+    XLSX.writeFile(wb, `รายการพัสดุทั้งหมด_${dateStr}.xlsx`);
+    toast('ส่งออกข้อมูลทั้งหมด '+S.categories.length+' ประเภทสำเร็จ', 'success');
+  } catch(e){
+    console.error(e);
+    toast('เกิดข้อผิดพลาดขณะส่งออกข้อมูล', 'error');
+  } finally {
+    showLoading(false);
+    if(btn){ btn.disabled = false; btn.style.opacity = '1'; }
+  }
+}
+
 function dlBlob(blob, fn){ const u = URL.createObjectURL(blob), a = document.createElement('a'); a.href = u; a.download = fn; a.click(); setTimeout(()=>URL.revokeObjectURL(u), 1000); }
 
 /** ป้องกัน CSV/Formula Injection: ถ้าค่าขึ้นต้นด้วย = + - @ (หรือ tab/CR ที่ตามด้วยตัวเหล่านี้) ให้เติม ' นำหน้า
