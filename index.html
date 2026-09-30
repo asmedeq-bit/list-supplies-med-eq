@@ -3705,6 +3705,7 @@ function trkRenderEdit(row, base){
   document.getElementById('trk-modal-body').innerHTML = `
     ${r.item_id ? `<div class="trk-info"><i class="fas fa-link"></i> เชื่อมกับรายการพัสดุ <b>#${r.item_id}</b> ${escHtml(cat?'('+cat.name+')':'')} — เมื่อบันทึก ระบบจะเสนอให้อัปเดตสถานะในรายการพัสดุ (ต้องกดยืนยันก่อนเสมอ)</div>`
       : `<div class="trk-info"><i class="fas fa-circle-info"></i> เรื่องนี้ไม่ได้เชื่อมกับรายการพัสดุ — ถ้าเครื่องยังอยู่ในรายการพัสดุ แนะนำให้เริ่มเรื่องจากปุ่ม <i class="fas fa-route"></i> ที่แถวของเครื่องในตาราง เพื่อดึงข้อมูลเครื่องและเชื่อมสถานะอัตโนมัติ</div>`}
+    <div id="trk-e-sync"></div>
     <div class="form-grid">
       ${inp('item_name','ชื่อเครื่อง / พัสดุ', r.item_name, true, true)}
       ${inp('spec','คุณลักษณะ/คุณสมบัติ', r.spec, true)}
@@ -3734,6 +3735,7 @@ function trkRenderEdit(row, base){
     <button class="btn btn-primary" onclick="trkSave()" id="trk-save-btn"><i class="fas fa-save"></i> บันทึก</button>`;
   document.getElementById('trk-overlay').classList.add('show');
   setTimeout(()=>{ const el = document.getElementById('trk-e-item_name'); if(el && !el.value) el.focus(); }, 150);
+  if(row && row.item_id) trkPullItemIntoForm(row);
 }
 
 async function trkSave(){
@@ -3937,8 +3939,65 @@ function trkStartFromItem(itemId, kind){
 /** ทิศกลับ: หลังบันทึกรายการพัสดุ ถ้าสถานะเปลี่ยนเข้ากลุ่ม ชำรุด/ระหว่างจำหน่าย หรือ รอขึ้นทะเบียน
  *  และเครื่องยังไม่มีเรื่องประเภทนั้น → ถามว่าจะเปิดเรื่องไหม (ไม่เปิดเองอัตโนมัติ)
  *  ไม่ถาม PIN ซ้ำ เพราะเพิ่งยืนยัน PIN ตอนบันทึก (กันปัญหา PIN ซ้อน) — การบันทึกเรื่องยังตรวจ PIN ที่ server ตามปกติ */
-function trkAfterItemSave(prev, newStatus){
-  if(!TRK.loaded || !prev || !newStatus) return;
+/** เทียบข้อมูลเครื่องในเรื่อง (สำเนา) กับรายการพัสดุ — รายการพัสดุเป็นข้อมูลหลัก
+ *  ทะเบียน/S-N/INH/NVH: ถ้าในรายการพัสดุมีค่า และต่างจากในเรื่อง → ใช้ค่าจากรายการพัสดุ
+ *  คุณลักษณะ: ใช้ของรายการพัสดุเมื่อหมวดมีคอลัมน์คุณลักษณะจริง ไม่งั้นเติมเฉพาะเมื่อในเรื่องว่าง
+ *  การได้มา (ขึ้นทะเบียน): เติมเฉพาะเมื่อในเรื่องว่าง (ชื่องบประมาณ กับ การได้มา อาจหมายถึงคนละอย่าง)
+ *  ชื่อเครื่อง: ไม่แตะ (ในเรื่องมักตั้งชื่อละเอียดกว่าชื่อหมวด) */
+const TRK_SYNC_LABEL = { asset_reg_no:'ทะเบียนครุภัณฑ์', sn:'S/N', inh_no:'INH No.', nvh_no:'NVH No.', spec:'คุณลักษณะ', acquisition_method:'การได้มา' };
+function trkItemDiff(r, item, cat){
+  if(!r || !item || !cat) return [];
+  const pre = trkPrefillFromItem(item, cat);
+  const specKey = (cat.headers || []).find(h => normH(h).startsWith('รายการลักษณะ'));
+  const out = [];
+  const cur = k => String(r[k] || '').trim();
+  ['asset_reg_no','sn','inh_no','nvh_no'].forEach(k => { if(pre[k] && pre[k] !== cur(k)) out.push({ k, from: cur(k), to: pre[k] }); });
+  // หมวดที่มีคอลัมน์คุณลักษณะ: ใช้ค่าคอลัมน์นั้นเท่านั้น (ว่าง = ไม่แตะ) · หมวดที่ไม่มี: ใช้ ยี่ห้อ+รุ่น เฉพาะเมื่อในเรื่องว่าง
+  const specVal = specKey ? trkClean((item.data || {})[specKey]) : pre.spec;
+  if(specVal && specVal !== cur('spec') && (specKey || !cur('spec'))) out.push({ k:'spec', from: cur('spec'), to: specVal });
+  if(r.kind === 'register' && pre.acquisition_method && !cur('acquisition_method')) out.push({ k:'acquisition_method', from:'', to: pre.acquisition_method });
+  return out;
+}
+/** หลังบันทึกรายการพัสดุ: อัปเดตข้อมูลเครื่องในเรื่องติดตามที่เชื่อมอยู่ให้ตรงกับรายการพัสดุ (PIN เพิ่งยืนยันตอนบันทึก) */
+async function trkSyncSnapshots(itemId, catId){
+  const cat = S.categories.find(c => c.id === catId);
+  const item = cat ? (S.allItems[cat.id] || []).find(i => i.id === itemId) : null;
+  if(!cat || !item) return;
+  for(const r of (TRK.byItem[itemId] || []).slice()){
+    const diff = trkItemDiff(r, item, cat);
+    if(!diff.length) continue;
+    const payload = Object.assign({}, r);
+    diff.forEach(d => { payload[d.k] = d.to; });
+    try {
+      const { data, error } = await sb.rpc('rpc_upsert_tracking', { p_id: r.id, p_payload: payload, p_pin: PIN_CORRECT });
+      if(error) throw error;
+      const idx = TRK.rows.findIndex(x => x.id === data.id); if(idx >= 0) TRK.rows[idx] = data;
+      trkIndex();
+      toast(`อัปเดตข้อมูลเครื่องในเรื่อง${TRK_KIND_LABEL[r.kind]}ให้ตรงกับรายการพัสดุแล้ว (${diff.map(d => TRK_SYNC_LABEL[d.k]).join(', ')})`, 'success');
+    } catch(e){ toast('อัปเดตข้อมูลเครื่องในเรื่องติดตามไม่สำเร็จ: ' + e.message, 'error'); }
+  }
+  trkRerender();
+}
+/** เปิดฟอร์มแก้ไขเรื่องที่เชื่อมกับรายการพัสดุ → ดึงข้อมูลล่าสุดของเครื่องมาใส่ฟอร์ม (ยังไม่บันทึกจนกว่าจะกดบันทึก) */
+async function trkPullItemIntoForm(r){
+  const box = () => document.getElementById('trk-e-sync');
+  try {
+    const { data: item, error } = await sb.from('items').select('*').eq('id', r.item_id).maybeSingle();
+    if(error) throw error;
+    if(!item || TRK.editRow !== r || !box()) return;
+    const cat = S.categories.find(c => c.id === item.category_id);
+    const diff = trkItemDiff(r, item, cat);
+    if(!diff.length) return;
+    diff.forEach(d => { const el = document.getElementById('trk-e-' + d.k); if(el) el.value = d.to; });
+    box().innerHTML = `<div class="trk-info" style="border-color:#93c5fd"><i class="fas fa-rotate" style="color:var(--primary)"></i> ดึงข้อมูลล่าสุดจากรายการพัสดุ #${item.id} ใส่ในฟอร์มแล้ว ${diff.length} ช่อง — กด "บันทึก" เพื่อใช้ค่าใหม่ หรือ "ยกเลิก" เพื่อคงค่าเดิม
+      <div style="margin-top:4px">${diff.map(d => `${escHtml(TRK_SYNC_LABEL[d.k])}: <s>${escHtml(d.from || '(ว่าง)')}</s> → <b>${escHtml(d.to)}</b>`).join('<br>')}</div></div>`;
+  } catch(e){ /* ดึงไม่ได้ก็ใช้ข้อมูลในเรื่องตามเดิม */ }
+}
+
+async function trkAfterItemSave(prev, newStatus){
+  if(!TRK.loaded || !prev) return;
+  await trkSyncSnapshots(prev.id, prev.catId);
+  if(!newStatus) return;
   const g = trkStatusGroup(newStatus), pg = trkStatusGroup(prev.status);
   if(g === pg) return;
   let kind = null;
