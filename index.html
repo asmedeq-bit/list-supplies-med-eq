@@ -1039,7 +1039,7 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
         <p style="font-size:13px;color:var(--text);line-height:1.9;margin-top:8px"><b>Q: ช่องสถานะที่ว่างเปล่าจริงๆ (ไม่มีข้อความใดๆ) จะแสดงว่าอะไร?</b><br>A: ระบบจะจัดกลุ่มให้อัตโนมัติเป็น "ไม่ระบุสถานะ" และมีลิงก์แยกให้คลิกดูเฉพาะกลุ่มนี้ได้จากการ์ด "รายการทั้งหมด" ที่หน้า Dashboard</p>
         <p style="font-size:13px;color:var(--text);line-height:1.9;margin-top:8px"><b>Q: ปีงบประมาณคำนวณอย่างไร?</b><br>A: ปีงบประมาณของไทยเริ่ม 1 ต.ค. – 30 ก.ย. โดยตั้งชื่อตามปีที่สิ้นสุด เช่น พัสดุที่ได้มาเดือน พ.ย. 2568 จะอยู่ในปีงบประมาณ 2569 ระบบรองรับวันที่ได้มาหลายรูปแบบ ทั้งปี พ.ศ. และ ค.ศ. และแปลงให้ถูกต้องอัตโนมัติ</p>
         <p style="font-size:13px;color:var(--text);line-height:1.9;margin-top:8px"><b>Q: ลืม PIN ทำอย่างไร?</b><br>A: ติดต่อผู้ดูแลระบบ (ผู้พัฒนาแอป) เพื่อขอทราบรหัส PIN ที่ถูกต้อง ระบบไม่มีฟังก์ชันรีเซ็ต PIN ด้วยตนเอง</p>
-        <p style="font-size:13px;color:var(--text);line-height:1.9;margin-top:8px"><b>Q: กรอก PIN ผิดจะเกิดอะไรขึ้น?</b><br>A: ระบบจะแจ้งเตือน "PIN ไม่ถูกต้อง" พร้อมบอกจำนวนครั้งที่เหลือ ถ้ากรอกผิดติดกัน 5 ครั้ง (ภายใน 15 นาที) ระบบจะล็อกการใช้ PIN ชั่วคราว 5 นาที ระหว่างนั้นบันทึก/แก้ไข/ลบไม่ได้ทุกเครื่อง เพราะใช้บัญชีร่วมกัน — PIN ตรวจที่ server ไม่ได้เก็บไว้ในหน้าเว็บ</p>
+        <p style="font-size:13px;color:var(--text);line-height:1.9;margin-top:8px"><b>Q: กรอก PIN ผิดจะเกิดอะไรขึ้น?</b><br>A: ระบบจะแจ้งเตือน "PIN ไม่ถูกต้อง กรุณาลองใหม่" และให้กรอกใหม่ได้ทันที ไม่มีการล็อกหรือจำกัดจำนวนครั้งที่กรอกผิด — PIN ตรวจที่ server ไม่ได้เก็บไว้ในหน้าเว็บ</p>
         <p style="font-size:13px;color:var(--text);line-height:1.9;margin-top:8px"><b>Q: โหมดมืด/สว่างที่ตั้งไว้ จะใช้ได้ทุกเครื่องไหม?</b><br>A: ระบบจดจำการตั้งค่าไว้ในเบราว์เซอร์ของเครื่องนั้นๆ เท่านั้น (localStorage) ไม่ซิงก์ข้ามเครื่อง/เบราว์เซอร์ ถ้าเปลี่ยนเครื่องหรือเปลี่ยนเบราว์เซอร์ต้องตั้งค่าใหม่</p>
         <p style="font-size:13px;color:var(--text);line-height:1.9;margin-top:8px"><b>Q: ข้อมูลที่เห็นล่าสุดหรือยัง ถ้ามีคนอื่นแก้ไขพร้อมกัน?</b><br>A: ระบบโหลดข้อมูลตอนเข้าหน้านั้นๆ หากสงสัยว่ามีคนอื่นแก้ไขข้อมูลระหว่างที่เปิดหน้าจออยู่ ให้กดปุ่ม <b>"รีเฟรช"</b> ที่แถบด้านบนเพื่อดึงข้อมูลล่าสุดจากฐานข้อมูล</p>
         <p style="font-size:13px;color:var(--text);line-height:1.9;margin-top:8px"><b>Q: ค้นหาในตารางมีกี่แบบ ต่างกันอย่างไร?</b><br>A: มี 3 โหมด — "ภายในคำ" (ค้นหาคำที่ปรากฏอยู่ที่ใดก็ได้ในข้อความ), "ขึ้นต้นด้วย" (ต้องขึ้นต้นด้วยคำที่พิมพ์), และ "ตรงคำ" (ต้องตรงกันทั้งหมด) เลือกได้จากปุ่มข้างช่องค้นหาในหน้าตารางแต่ละประเภท</p>
@@ -2579,10 +2579,7 @@ async function checkPin(){
     for(let i=0;i<4;i++) document.getElementById('pd'+i).classList.add('error');
     document.getElementById('pin-dots').style.animation = 'pinShake .4s ease';
     setTimeout(()=>{ document.getElementById('pin-dots').style.animation=''; },400);
-    let msg = errMsg;
-    if(!msg && res && res.locked_seconds > 0) msg = `กรอก PIN ผิดหลายครั้ง ระบบล็อกชั่วคราว — ลองใหม่ในอีก ${Math.ceil(res.locked_seconds/60)} นาที`;
-    else if(!msg) msg = `PIN ไม่ถูกต้อง กรุณาลองใหม่${res && typeof res.remaining === 'number' ? ` (เหลืออีก ${res.remaining} ครั้งก่อนล็อก 5 นาที)` : ''}`;
-    document.getElementById('pin-error').textContent = msg;
+    document.getElementById('pin-error').textContent = errMsg || 'PIN ไม่ถูกต้อง กรุณาลองใหม่';
     pinBuffer = '';
     setTimeout(renderPinDots, 400);
     const inp = document.getElementById('pin-input'); inp.value=''; inp.focus();
