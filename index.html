@@ -350,6 +350,16 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
 .trk-info{font-size:12px;color:var(--text-muted);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin-bottom:12px;line-height:1.6}
 .trk-choice{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;margin-bottom:10px;background:var(--bg)}
 .trk-choice .t{flex:1;min-width:0}
+.trk-step-extra{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-top:4px;font-size:12px}
+.trk-doc{color:var(--text-muted)}
+.trk-files{display:inline-flex;flex-wrap:wrap;gap:6px}
+.trk-file{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border:1px solid var(--border);border-radius:14px;background:var(--bg)}
+.trk-file-del{cursor:pointer;color:var(--text-muted);font-size:11px;padding:2px}
+.trk-file-del:hover{color:var(--danger)}
+.trk-attach{cursor:pointer;color:var(--primary);font-weight:600;font-size:12px;padding:2px 8px;border:1px dashed var(--border);border-radius:14px}
+.trk-attach:hover{border-color:var(--primary);background:var(--primary-light)}
+.trk-log-row{font-size:12px;padding:7px 0;border-bottom:1px dashed var(--border);line-height:1.6}
+.trk-log-row:last-child{border-bottom:none}
 </style>
 </head>
 <body>
@@ -565,6 +575,9 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
         </div>
         <!-- TRK: Dashboard ทะเบียน/จำหน่าย (รูปแบบเดียวกับระบบ Google Sheet เดิม) -->
         <div id="trk-dash-view" style="display:none">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+            <button class="btn btn-ghost btn-sm" onclick="trkExportDashPDF()"><i class="fas fa-file-pdf"></i> ส่งออกรายงานสรุป (PDF)</button>
+          </div>
           <div class="trk-info" id="trk-bd-header" style="font-size:13px"></div>
           <div class="trk-section-title"><i class="fas fa-chart-simple"></i> ภาพรวม</div>
           <div class="stat-grid" id="trk-bd-row1"></div>
@@ -858,6 +871,7 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
         <a href="#mb-sec4" class="badge-dd" style="text-decoration:none">4. การส่งออกข้อมูล</a>
         <a href="#mb-sec5" class="badge-dd" style="text-decoration:none">5. Dark mode</a>
         <a href="#mb-sec6" class="badge-dd" style="text-decoration:none">6. คำถามที่พบบ่อย</a>
+        <a href="#mb-sec7" class="badge-dd" style="text-decoration:none">7. ติดตามขึ้นทะเบียน/จำหน่าย</a>
       </div>
 
       <div id="mb-sec1" style="margin-bottom:22px">
@@ -920,7 +934,18 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
         <p style="font-size:13px;color:var(--text);line-height:1.9;margin-top:8px"><b>Q: ปีงบประมาณคำนวณอย่างไร?</b><br>A: ปีงบประมาณของไทยเริ่ม 1 ต.ค. – 30 ก.ย. โดยตั้งชื่อตามปีที่สิ้นสุด เช่น พัสดุที่ได้มาเดือน พ.ย. 2568 จะอยู่ในปีงบประมาณ 2569</p>
         <p style="font-size:13px;color:var(--text);line-height:1.9;margin-top:8px"><b>Q: ลืม PIN ทำอย่างไร?</b><br>A: ติดต่อผู้ดูแลระบบ (ผู้พัฒนาแอป) เพื่อขอทราบรหัส PIN ที่ถูกต้อง</p>
       </div>
-    
+
+      <div id="mb-sec7" style="margin:22px 0 6px">
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:8px;color:var(--primary)">7. ติดตามขึ้นทะเบียน / จำหน่าย</h3>
+        <ol style="padding-left:20px;line-height:1.9;font-size:13px;color:var(--text)">
+          <li>เริ่มเรื่องจากตารางรายการพัสดุ: กดปุ่ม <b>เส้นทาง</b> (ไอคอน <i class="fas fa-route"></i>) ที่แถวเครื่อง → <b>"เริ่มเรื่องจำหน่าย"</b> หรือ <b>"เริ่มเรื่องขึ้นทะเบียน"</b> → ใส่ PIN → ระบบดึงชื่อ ทะเบียน S/N INH NVH ให้</li>
+          <li>กรอก <b>วันที่</b> ของขั้นที่ทำแล้ว (ใส่ย้อนหลังได้) และ <b>เลขที่หนังสือ</b> ถ้ามี → บันทึก</li>
+          <li>ระบบจะถามว่าจะ <b>อัปเดตสถานะในรายการพัสดุ</b> ด้วยไหม (เช่น ใช้ราชการได้ → ระหว่างทำเรื่องจำหน่าย) กดยืนยันจึงจะเปลี่ยน</li>
+          <li>เมื่อขั้นถัดไปเสร็จ เปิดเรื่อง → <b>"แก้ไข / บันทึกวันที่"</b> · แนบไฟล์ใบอนุมัติได้ที่ปุ่ม <b>"แนบไฟล์"</b> ใต้แต่ละขั้น (PDF/JPG/PNG ไม่เกิน 2 MB)</li>
+          <li>ดูภาพรวมที่เมนู <b>"Dashboard ทะเบียน/จำหน่าย"</b> — คลิกการ์ด/กราฟเพื่อดูรายการ, ส่งออกรายงาน PDF ได้</li>
+        </ol>
+      </div>
+
     </div>
     <div class="modal-body" id="manual-body-detailed" style="display:none">
       
@@ -931,6 +956,7 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
         <a href="#md-sec4" class="badge-dd" style="text-decoration:none">4. การส่งออกข้อมูล</a>
         <a href="#md-sec5" class="badge-dd" style="text-decoration:none">5. Dark mode</a>
         <a href="#md-sec6" class="badge-dd" style="text-decoration:none">6. คำถามที่พบบ่อย</a>
+        <a href="#md-sec7" class="badge-dd" style="text-decoration:none">7. ติดตามขึ้นทะเบียน/จำหน่าย</a>
       </div>
 
       <div id="md-sec1" style="margin-bottom:22px">
@@ -1013,14 +1039,29 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
         <p style="font-size:13px;color:var(--text);line-height:1.9;margin-top:8px"><b>Q: ช่องสถานะที่ว่างเปล่าจริงๆ (ไม่มีข้อความใดๆ) จะแสดงว่าอะไร?</b><br>A: ระบบจะจัดกลุ่มให้อัตโนมัติเป็น "ไม่ระบุสถานะ" และมีลิงก์แยกให้คลิกดูเฉพาะกลุ่มนี้ได้จากการ์ด "รายการทั้งหมด" ที่หน้า Dashboard</p>
         <p style="font-size:13px;color:var(--text);line-height:1.9;margin-top:8px"><b>Q: ปีงบประมาณคำนวณอย่างไร?</b><br>A: ปีงบประมาณของไทยเริ่ม 1 ต.ค. – 30 ก.ย. โดยตั้งชื่อตามปีที่สิ้นสุด เช่น พัสดุที่ได้มาเดือน พ.ย. 2568 จะอยู่ในปีงบประมาณ 2569 ระบบรองรับวันที่ได้มาหลายรูปแบบ ทั้งปี พ.ศ. และ ค.ศ. และแปลงให้ถูกต้องอัตโนมัติ</p>
         <p style="font-size:13px;color:var(--text);line-height:1.9;margin-top:8px"><b>Q: ลืม PIN ทำอย่างไร?</b><br>A: ติดต่อผู้ดูแลระบบ (ผู้พัฒนาแอป) เพื่อขอทราบรหัส PIN ที่ถูกต้อง ระบบไม่มีฟังก์ชันรีเซ็ต PIN ด้วยตนเอง</p>
-        <p style="font-size:13px;color:var(--text);line-height:1.9;margin-top:8px"><b>Q: กรอก PIN ผิดจะเกิดอะไรขึ้น?</b><br>A: ระบบจะแจ้งเตือน "PIN ไม่ถูกต้อง กรุณาลองใหม่" และให้กรอกใหม่ได้ทันที ไม่มีการล็อกหรือจำกัดจำนวนครั้งที่กรอกผิด</p>
+        <p style="font-size:13px;color:var(--text);line-height:1.9;margin-top:8px"><b>Q: กรอก PIN ผิดจะเกิดอะไรขึ้น?</b><br>A: ระบบจะแจ้งเตือน "PIN ไม่ถูกต้อง" พร้อมบอกจำนวนครั้งที่เหลือ ถ้ากรอกผิดติดกัน 5 ครั้ง (ภายใน 15 นาที) ระบบจะล็อกการใช้ PIN ชั่วคราว 5 นาที ระหว่างนั้นบันทึก/แก้ไข/ลบไม่ได้ทุกเครื่อง เพราะใช้บัญชีร่วมกัน — PIN ตรวจที่ server ไม่ได้เก็บไว้ในหน้าเว็บ</p>
         <p style="font-size:13px;color:var(--text);line-height:1.9;margin-top:8px"><b>Q: โหมดมืด/สว่างที่ตั้งไว้ จะใช้ได้ทุกเครื่องไหม?</b><br>A: ระบบจดจำการตั้งค่าไว้ในเบราว์เซอร์ของเครื่องนั้นๆ เท่านั้น (localStorage) ไม่ซิงก์ข้ามเครื่อง/เบราว์เซอร์ ถ้าเปลี่ยนเครื่องหรือเปลี่ยนเบราว์เซอร์ต้องตั้งค่าใหม่</p>
         <p style="font-size:13px;color:var(--text);line-height:1.9;margin-top:8px"><b>Q: ข้อมูลที่เห็นล่าสุดหรือยัง ถ้ามีคนอื่นแก้ไขพร้อมกัน?</b><br>A: ระบบโหลดข้อมูลตอนเข้าหน้านั้นๆ หากสงสัยว่ามีคนอื่นแก้ไขข้อมูลระหว่างที่เปิดหน้าจออยู่ ให้กดปุ่ม <b>"รีเฟรช"</b> ที่แถบด้านบนเพื่อดึงข้อมูลล่าสุดจากฐานข้อมูล</p>
         <p style="font-size:13px;color:var(--text);line-height:1.9;margin-top:8px"><b>Q: ค้นหาในตารางมีกี่แบบ ต่างกันอย่างไร?</b><br>A: มี 3 โหมด — "ภายในคำ" (ค้นหาคำที่ปรากฏอยู่ที่ใดก็ได้ในข้อความ), "ขึ้นต้นด้วย" (ต้องขึ้นต้นด้วยคำที่พิมพ์), และ "ตรงคำ" (ต้องตรงกันทั้งหมด) เลือกได้จากปุ่มข้างช่องค้นหาในหน้าตารางแต่ละประเภท</p>
         <p style="font-size:13px;color:var(--text);line-height:1.9;margin-top:8px"><b>Q: ใช้งานได้บนมือถือ/แท็บเล็ตไหม?</b><br>A: ใช้งานผ่านเบราว์เซอร์บนมือถือ/แท็บเล็ตได้ แต่แนะนำให้ใช้บนคอมพิวเตอร์เป็นหลัก เนื่องจากตารางข้อมูลมีหลายคอลัมน์ จะดูสะดวกกว่าบนหน้าจอที่กว้าง</p>
         <p style="font-size:13px;color:var(--text);line-height:1.9;margin-top:8px"><b>Q: ต้องต่ออินเทอร์เน็ตตลอดเวลาไหม?</b><br>A: ต้องต่ออินเทอร์เน็ตตลอดการใช้งาน เพราะข้อมูลทั้งหมดเก็บและประมวลผลบนฐานข้อมูลกลาง (Supabase) ไม่มีการเก็บข้อมูลไว้ในเครื่องเพื่อใช้งานแบบออฟไลน์</p>
       </div>
-    
+
+      <div id="md-sec7" style="margin:22px 0 6px">
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:8px;color:var(--primary)">7. ติดตามขึ้นทะเบียน / จำหน่าย</h3>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:8px">ระบบติดตามเก็บ "เรื่อง" แยกจากรายการพัสดุ (1 เครื่องมีเรื่องจำหน่ายและเรื่องขึ้นทะเบียนได้อย่างละ 1 เรื่อง) ขั้นตอนและจำนวนวันที่ค้างคำนวณจากวันที่ที่บันทึกทุกครั้งที่แสดงผล</p>
+        <ul style="padding-left:20px;line-height:1.9;font-size:13px;color:var(--text)">
+          <li><b>ขั้นตอนจำหน่าย:</b> ขอซ่อมทำ → ขอจำหน่าย → รายงานผลสอบข้อเท็จจริง → คืนซาก → อนุมัติจำหน่าย → บันทึกจำหน่าย</li>
+          <li><b>ขั้นตอนขึ้นทะเบียน:</b> รับมา → ได้ DTO → รายงานขึ้นทะเบียน → อนุมัติขึ้นทะเบียน → บันทึกขึ้นทะเบียน (แนะนำให้เพิ่มเครื่องในรายการพัสดุก่อน สถานะ "ใช้ราชการได้รอขึ้นทะเบียน" แล้วเริ่มเรื่องจากแถวนั้น)</li>
+          <li><b>ขั้นที่ถือว่าเสร็จ:</b> มีวันที่ หรือมีข้อความที่ไม่ได้ขึ้นต้นด้วย "รอ"/"ค้าง" (เช่น "ได้ DTO แล้ว", "รับโอน") — ข้อความที่ขึ้นต้นด้วย "รอ" ถือว่ายังไม่เสร็จ</li>
+          <li><b>จำนวนวันค้าง:</b> นับจากวันที่ล่าสุดที่บันทึกไว้ในเรื่อง — สีเหลืองเกิน 90 วัน สีแดงเกิน 180 วัน · ไอคอน <i class="fas fa-circle-exclamation" style="color:var(--danger)"></i> = มีขั้นก่อนหน้าที่ไม่มีข้อมูล (กรองได้ด้วย "มีขั้นที่ข้าม/ไม่มีข้อมูล")</li>
+          <li><b>ความสัมพันธ์กับรายการพัสดุ:</b> ป้าย "จำหน่าย 2/6" ข้างสถานะ = เครื่องมีเรื่องค้างอยู่ (คลิกเปิดเรื่อง) · เมื่อบันทึกเรื่อง ระบบ<b>เสนอ</b>อัปเดตสถานะเครื่อง ต้องกดยืนยันก่อน · ระบบไม่ย้อนสถานะเครื่องที่จำหน่ายแล้ว · ถ้าแก้สถานะเครื่องเป็นชำรุด/ระหว่างจำหน่าย/รอขึ้นทะเบียนในฟอร์มรายการพัสดุ ระบบจะถามว่าจะเปิดเรื่องติดตามไหม</li>
+          <li><b>เลขที่หนังสือและไฟล์แนบ:</b> ใส่เลขที่หนังสือได้ทุกขั้นในฟอร์มแก้ไข · แนบไฟล์ได้ที่หน้ารายละเอียดเรื่อง (PDF/JPG/PNG ไฟล์ละไม่เกิน 2 MB) · ลบเรื่องแล้วไฟล์แนบถูกลบตาม</li>
+          <li><b>ประวัติการแก้ไข:</b> หน้ารายละเอียดแสดงว่าเปลี่ยนอะไร จากค่าอะไรเป็นค่าอะไร เมื่อไร (บัญชีเป็นบัญชีร่วมของแผนก จึงแสดงอีเมลบัญชีเดียวกัน)</li>
+          <li><b>ลบเรื่อง:</b> ลบเฉพาะเรื่องติดตาม รายการพัสดุไม่ถูกลบ · ถ้าลบเครื่องออกจากรายการพัสดุ เรื่องยังอยู่ (แสดงว่า "ไม่มีในรายการพัสดุ")</li>
+        </ul>
+      </div>
+
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeUserManual()">ปิด</button>
@@ -2402,6 +2443,7 @@ async function saveRow(){
   const status = sk>=0 ? normalizeStatus(arr[sk]) : null;
   const dept = dk>=0 ? String(arr[dk]||'').trim() || null : null;
 
+  const trkPrev = S.editItemId !== null ? { id: S.editItemId, catId: cat.id, status: normalizeStatus(((S.allItems[cat.id]||[]).find(i => i.id === S.editItemId) || {}).status || '') } : null; // TRK: สถานะก่อนแก้
   showLoading(true);
   try {
     let nextRow = 0;
@@ -2422,6 +2464,7 @@ async function saveRow(){
     toast(S.editItemId !== null ? 'บันทึกสำเร็จ' : 'เพิ่มเครื่องมือใหม่สำเร็จ','success');
     closeModal();
     await invalidate();
+    if(trkPrev) trkAfterItemSave(trkPrev, status); // TRK: เสนอเปิดเรื่องติดตามเมื่อสถานะเปลี่ยน
     if(S._smReopen){ const fn = S._smReopen; S._smReopen = null; setTimeout(fn, 250); }
   } catch(e){ toast('ผิดพลาด: '+e.message,'error'); }
   finally { showLoading(false); }
@@ -2465,7 +2508,10 @@ async function invalidate(){
 }
 
 // ─── PIN Protection ───────────────────────────────────────────────────────
-const PIN_CORRECT = '4321';
+// ไม่ฝัง PIN ในโค้ดแล้ว — ตรวจกับ server ผ่าน rpc_verify_pin แล้วเก็บ PIN ที่ผ่านการตรวจล่าสุดไว้ในหน่วยความจำ
+// (ชื่อตัวแปรคงเดิม เพื่อให้ RPC เดิมทุกจุดที่ส่ง p_pin: PIN_CORRECT ใช้ได้โดยไม่ต้องแก้) — server ตรวจ PIN ซ้ำทุกครั้งอยู่แล้ว
+let PIN_CORRECT = '';
+let pinChecking = false;
 let pinBuffer = '';
 let pinCallback = null;
 
@@ -2510,9 +2556,22 @@ function pinBackspace(){
   document.getElementById('pin-error').textContent = '';
 }
 
-function checkPin(){
+async function checkPin(){
   if(!document.getElementById('pin-overlay').classList.contains('show')) return;
-  if(pinBuffer === PIN_CORRECT){
+  if(pinChecking) return;
+  pinChecking = true;
+  const entered = pinBuffer;
+  document.getElementById('pin-error').textContent = 'กำลังตรวจสอบ...';
+  let res = null, errMsg = '';
+  try {
+    const { data, error } = await sb.rpc('rpc_verify_pin', { p_pin: entered });
+    if(error) throw error;
+    res = data || {};
+  } catch(e){ errMsg = 'ตรวจสอบ PIN ไม่ได้: ' + e.message; }
+  finally { pinChecking = false; }
+  if(!document.getElementById('pin-overlay').classList.contains('show')) return;
+  if(res && res.ok){
+    PIN_CORRECT = entered;
     const cb = pinCallback;
     closePinModal();
     if(cb) cb();
@@ -2520,7 +2579,10 @@ function checkPin(){
     for(let i=0;i<4;i++) document.getElementById('pd'+i).classList.add('error');
     document.getElementById('pin-dots').style.animation = 'pinShake .4s ease';
     setTimeout(()=>{ document.getElementById('pin-dots').style.animation=''; },400);
-    document.getElementById('pin-error').textContent = 'PIN ไม่ถูกต้อง กรุณาลองใหม่';
+    let msg = errMsg;
+    if(!msg && res && res.locked_seconds > 0) msg = `กรอก PIN ผิดหลายครั้ง ระบบล็อกชั่วคราว — ลองใหม่ในอีก ${Math.ceil(res.locked_seconds/60)} นาที`;
+    else if(!msg) msg = `PIN ไม่ถูกต้อง กรุณาลองใหม่${res && typeof res.remaining === 'number' ? ` (เหลืออีก ${res.remaining} ครั้งก่อนล็อก 5 นาที)` : ''}`;
+    document.getElementById('pin-error').textContent = msg;
     pinBuffer = '';
     setTimeout(renderPinDots, 400);
     const inp = document.getElementById('pin-input'); inp.value=''; inp.focus();
@@ -3146,7 +3208,7 @@ const TRK_AGE_WARN = 90, TRK_AGE_BAD = 180; // จำนวนวันที่
 const TRK_TEXT_FIELDS = ['item_name','spec','asset_reg_no','sn','inh_no','nvh_no','acquisition_method','note'];
 
 const TRK = { rows:[], byItem:{}, loaded:false, kind:'dispose', mode:'list', filtered:[], page:1, ps:50,
-  editRow:null, editBase:null, confirmFn:null, dashItems:[], drill:null };
+  editRow:null, editBase:null, confirmFn:null, dashItems:[], drill:null, viewId:null, viewFiles:[] };
 
 // ─── helpers ───
 function trkParseDate(s){
@@ -3158,6 +3220,7 @@ function trkYmd(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2
 function trkFmtDate(s){ const d = trkParseDate(s); return d ? d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric'}) : ''; }
 function trkClean(v){ let s = String(v === undefined || v === null ? '' : v).trim(); if(/^\d+\.0$/.test(s)) s = s.slice(0,-2); return s; }
 function trkStepText(r,k){ return String((r.step_text||{})[k]||'').trim(); }
+function trkStepDoc(r,k){ return String((r.step_doc||{})[k]||'').trim(); }
 function trkStepDone(r,k){ if(r[k]) return true; const t = trkStepText(r,k); return !!t && !/^(รอ|ค้าง)/.test(t); }
 
 /** คำนวณความคืบหน้าของ 1 เรื่อง (ไม่เก็บลง DB) */
@@ -3331,7 +3394,7 @@ function trkFilterRows(){
     if(/^w\d+$/.test(stage) && p.waitIdx !== +stage.slice(1)) return;
     if(fy && String(p.fy) !== fy) return;
     if(q){
-      const hay = TRK_TEXT_FIELDS.map(f => r[f]||'').concat(Object.values(r.step_text||{})).join(' ').toLowerCase();
+      const hay = TRK_TEXT_FIELDS.map(f => r[f]||'').concat(Object.values(r.step_text||{}), Object.values(r.step_doc||{})).join(' ').toLowerCase();
       if(!hay.includes(q)) return;
     }
     out.push({ r, p });
@@ -3439,7 +3502,14 @@ function trkOpenView(id){
     if(t) right += (right ? ' · ' : '') + `<span class="trk-sub">${escHtml(t)}</span>`;
     if(i === p.waitIdx) right = `<span style="color:#b45309;font-weight:600">กำลังรอ${p.days!==null?' — '+p.days+' วัน':''}</span>` + (right ? ' · ' + right : '');
     else if(!right) right = p.gaps.includes(i) ? '<span style="color:var(--danger)">ไม่มีข้อมูล</span>' : '<span class="trk-sub">—</span>';
-    return `<div class="trk-tl-row"><div class="trk-tl-ic ${cls}">${ic}</div><div class="trk-tl-main"><span style="font-weight:600">${i+1}. ${escHtml(s.l)}${gap}</span><span>${right}</span></div></div>`;
+    const doc = trkStepDoc(r, s.k);
+    return `<div class="trk-tl-row"><div class="trk-tl-ic ${cls}">${ic}</div><div>
+      <div class="trk-tl-main"><span style="font-weight:600">${i+1}. ${escHtml(s.l)}${gap}</span><span>${right}</span></div>
+      <div class="trk-step-extra">
+        ${doc ? `<span class="trk-doc"><i class="fas fa-file-lines"></i> เลขที่หนังสือ: ${escHtml(doc)}</span>` : ''}
+        <span class="trk-files" id="trk-files-${s.k}"></span>
+        <label class="trk-attach" title="แนบไฟล์ PDF/JPG/PNG ไม่เกิน 2 MB"><i class="fas fa-paperclip"></i> แนบไฟล์<input type="file" accept="application/pdf,image/jpeg,image/png" style="display:none" onchange="trkPickFile(${r.id},'${s.k}',this)"></label>
+      </div></div></div>`;
   }).join('');
   document.getElementById('trk-modal-body').innerHTML = `
     <div class="form-grid">
@@ -3456,13 +3526,18 @@ function trkOpenView(id){
     <div class="trk-section-title"><i class="fas fa-route"></i> ขั้นตอน — ${escHtml(trkStageText(p))} ${trkAgeHtml(p)}${p.fy?` <span class="trk-sub">ปีงบฯ ${p.fy}</span>`:''}</div>
     <div class="trk-tl">${tl}</div>
     ${p.gaps.length ? `<div class="trk-info" style="margin-top:10px;border-color:#fca5a5"><i class="fas fa-circle-exclamation" style="color:var(--danger)"></i> มีขั้นก่อนหน้าที่ไม่มีข้อมูล: ${p.gaps.map(i=>escHtml(p.steps[i].l)).join(', ')}</div>` : ''}
-    ${r.note ? `<div class="trk-section-title"><i class="fas fa-note-sticky"></i> หมายเหตุ</div><div style="font-size:13px;white-space:pre-wrap">${escHtml(r.note)}</div>` : ''}`;
+    ${r.note ? `<div class="trk-section-title"><i class="fas fa-note-sticky"></i> หมายเหตุ</div><div style="font-size:13px;white-space:pre-wrap">${escHtml(r.note)}</div>` : ''}
+    <div class="trk-section-title"><i class="fas fa-clock-rotate-left"></i> ประวัติการแก้ไข <span class="trk-sub" style="font-weight:400">(ล่าสุด 50 รายการ)</span></div>
+    <div id="trk-log-body"><span class="trk-sub">กำลังโหลด...</span></div>`;
   document.getElementById('trk-modal-footer').innerHTML = `
     <button class="btn btn-danger btn-sm" onclick="trkAskDelete(${r.id})" style="margin-right:auto"><i class="fas fa-trash"></i> ลบเรื่อง</button>
     <button class="btn btn-ghost" onclick="trkCloseModal()">ปิด</button>
     <button class="btn btn-primary" onclick="trkEdit(${r.id})"><i class="fas fa-edit"></i> แก้ไข / บันทึกวันที่</button>`;
   document.getElementById('trk-overlay').classList.add('show');
+  TRK.viewId = r.id; TRK.viewFiles = [];
   if(r.item_id) trkLoadItemStatus(r.item_id);
+  trkLoadFiles(r.id);
+  trkLoadLog(r.id);
 }
 async function trkLoadItemStatus(itemId){
   try {
@@ -3471,7 +3546,145 @@ async function trkLoadItemStatus(itemId){
     if(el) el.textContent = data ? '— สถานะ: ' + (data.status || 'ไม่ระบุ') : '— (ไม่พบในรายการพัสดุแล้ว)';
   } catch(e){ /* แสดงผลเสริมเท่านั้น ไม่ต้องแจ้ง error */ }
 }
-function trkCloseModal(){ document.getElementById('trk-overlay').classList.remove('show'); TRK.editRow = null; TRK.editBase = null; }
+function trkCloseModal(){ document.getElementById('trk-overlay').classList.remove('show'); TRK.editRow = null; TRK.editBase = null; TRK.viewId = null; }
+
+// ─── ไฟล์แนบแต่ละขั้น (Supabase Storage: bucket ส่วนตัว, ไฟล์ละ ≤ 2 MB, PDF/JPG/PNG) ───
+//  อัปโหลดไฟล์ → บันทึก metadata ผ่าน RPC (ตรวจ PIN) · ลบ: ลบ metadata ผ่าน RPC ก่อน แล้วค่อยลบไฟล์ (policy อนุญาตเฉพาะไฟล์ที่ไม่ถูกอ้างอิงแล้ว)
+const TRK_BUCKET = 'tracking-docs', TRK_MAX_FILE = 2 * 1024 * 1024, TRK_FILE_TYPES = ['application/pdf','image/jpeg','image/png'];
+function trkFmtSize(n){ n = +n || 0; return n >= 1048576 ? (n/1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n/1024)) + ' KB'; }
+async function trkLoadFiles(id){
+  try {
+    const { data, error } = await sb.from('asset_tracking_file').select('*').eq('tracking_id', id).order('id');
+    if(error) throw error;
+    if(TRK.viewId !== id) return;
+    TRK.viewFiles = (data || []).slice().sort((a,b) => a.id - b.id);
+    trkRenderFiles();
+  } catch(e){
+    if(TRK.viewId !== id) return;
+    document.querySelectorAll('.trk-files').forEach(el => { el.innerHTML = '<span class="trk-sub" style="color:var(--danger)">โหลดรายการไฟล์ไม่ได้</span>'; });
+  }
+}
+function trkRenderFiles(){
+  document.querySelectorAll('.trk-files').forEach(el => { el.innerHTML = ''; });
+  (TRK.viewFiles || []).forEach(f => {
+    const el = document.getElementById('trk-files-' + f.step_key); if(!el) return;
+    const icon = f.mime === 'application/pdf' ? 'fa-file-pdf' : 'fa-file-image';
+    el.insertAdjacentHTML('beforeend', `<span class="trk-file"><span class="trk-link" onclick="trkOpenFile(${f.id})" title="เปิดไฟล์"><i class="fas ${icon}"></i> ${escHtml(f.file_name || 'ไฟล์')}</span> <span class="trk-sub">${trkFmtSize(f.size)}</span> <i class="fas fa-xmark trk-file-del" onclick="trkAskDeleteFile(${f.id})" title="ลบไฟล์"></i></span>`);
+  });
+}
+function trkPickFile(id, stepKey, input){
+  const file = input.files && input.files[0];
+  input.value = '';
+  if(!file) return;
+  if(!TRK_FILE_TYPES.includes(file.type)){ toast('รับเฉพาะไฟล์ PDF, JPG หรือ PNG', 'error'); return; }
+  if(file.size > TRK_MAX_FILE){ toast(`ไฟล์ใหญ่เกิน 2 MB (${trkFmtSize(file.size)}) — กรุณาสแกน/ย่อให้เล็กลงก่อน`, 'error'); return; }
+  requirePin('แนบไฟล์: ' + file.name, () => trkUploadFile(id, stepKey, file));
+}
+async function trkUploadFile(id, stepKey, file){
+  const ext = file.type === 'application/pdf' ? 'pdf' : file.type === 'image/png' ? 'png' : 'jpg';
+  const path = `${id}/${stepKey}/${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
+  let uploaded = false;
+  showLoading(true);
+  try {
+    const { error: ue } = await sb.storage.from(TRK_BUCKET).upload(path, file, { contentType: file.type, upsert: false });
+    if(ue) throw ue;
+    uploaded = true;
+    const { error } = await sb.rpc('rpc_add_tracking_file', { p_tracking_id: id, p_step_key: stepKey, p_path: path, p_file_name: file.name, p_mime: file.type, p_size: file.size, p_pin: PIN_CORRECT });
+    if(error) throw error;
+    toast('แนบไฟล์แล้ว', 'success');
+  } catch(e){
+    if(uploaded){ try { await sb.storage.from(TRK_BUCKET).remove([path]); } catch(_){ /* ไฟล์กำพร้าจะถูกลบได้ภายหลัง */ } }
+    toast('แนบไฟล์ไม่สำเร็จ: ' + e.message, 'error');
+  } finally { showLoading(false); }
+  if(TRK.viewId === id){ trkLoadFiles(id); trkLoadLog(id); }
+}
+async function trkOpenFile(fileId){
+  const f = (TRK.viewFiles || []).find(x => x.id === fileId); if(!f) return;
+  const w = window.open('', '_blank'); // เปิดหน้าต่างทันทีตอนคลิก เพื่อไม่ให้ถูกบล็อก popup
+  try {
+    const { data, error } = await sb.storage.from(TRK_BUCKET).createSignedUrl(f.path, 300);
+    if(error) throw error;
+    if(w){ w.opener = null; w.location.href = data.signedUrl; }
+    else toast('เบราว์เซอร์บล็อกหน้าต่างใหม่ — กรุณาอนุญาต popup แล้วลองอีกครั้ง', 'error');
+  } catch(e){ if(w) w.close(); toast('เปิดไฟล์ไม่ได้: ' + e.message, 'error'); }
+}
+function trkAskDeleteFile(fileId){
+  const f = (TRK.viewFiles || []).find(x => x.id === fileId); if(!f) return;
+  const trkId = f.tracking_id;
+  requirePin('ลบไฟล์แนบ', () => {
+    trkConfirm('<span style="color:var(--danger)"><i class="fas fa-trash-alt"></i> ยืนยันการลบไฟล์แนบ</span>',
+      `<div style="padding:12px;background:var(--bg);border-radius:8px;font-size:13px;border-left:3px solid var(--danger)">${escHtml(f.file_name)} <span class="trk-sub">(${trkFmtSize(f.size)})</span></div>`,
+      'ลบไฟล์', 'ยกเลิก',
+      async () => {
+        showLoading(true);
+        try {
+          const { data: path, error } = await sb.rpc('rpc_delete_tracking_file', { p_id: fileId, p_pin: PIN_CORRECT });
+          if(error) throw error;
+          const { error: se } = await sb.storage.from(TRK_BUCKET).remove([path || f.path]);
+          if(se) toast('ลบข้อมูลไฟล์แล้ว แต่ลบไฟล์ใน Storage ไม่สำเร็จ: ' + se.message, 'error');
+          else toast('ลบไฟล์แล้ว', 'success');
+        } catch(e){ toast('ลบไฟล์ไม่สำเร็จ: ' + e.message, 'error'); }
+        finally { showLoading(false); }
+        if(TRK.viewId === trkId){ trkLoadFiles(trkId); trkLoadLog(trkId); }
+      }, true);
+  });
+}
+
+// ─── ประวัติการแก้ไข (บันทึกโดย trigger ในฐานข้อมูล) ───
+const TRK_FIELD_LABEL = { item_name:'ชื่อเครื่อง/พัสดุ', spec:'คุณลักษณะ', asset_reg_no:'ทะเบียนครุภัณฑ์', sn:'S/N', inh_no:'INH No.', nvh_no:'NVH No.',
+  acquisition_method:'การได้มา', line:'สาย', note:'หมายเหตุ', item_id:'รายการพัสดุ (id)', category_id:'หมวด (id)', kind:'ประเภท', source:'ที่มา' };
+function trkStepLabel(k){
+  for(const kind of ['dispose','register']){ const s = TRK_STEPS[kind].find(x => x.k === k); if(s) return s.l; }
+  return k;
+}
+function trkFmtLogVal(k, v){
+  if(v === null || v === undefined || v === '') return '—';
+  if(/_date$/.test(k)) return trkFmtDate(v) || String(v);
+  if(k === 'line') return TRK_LINE_LABEL[v] || String(v);
+  if(k === 'kind') return TRK_KIND_LABEL[v] || String(v);
+  return typeof v === 'object' ? JSON.stringify(v) : String(v);
+}
+function trkLogLines(e){
+  const c = e.changes || {}, out = [];
+  if(e.action === 'insert') out.push('สร้างเรื่อง');
+  else if(e.action === 'delete') out.push('ลบเรื่อง: ' + escHtml(c.item_name || '') + ' ' + escHtml(c.asset_reg_no || ''));
+  else if(e.action === 'file_add') out.push(`แนบไฟล์ (${escHtml(trkStepLabel(c.step_key))}): ${escHtml(c.file_name || '')}`);
+  else if(e.action === 'file_delete') out.push(`ลบไฟล์ (${escHtml(trkStepLabel(c.step_key))}): ${escHtml(c.file_name || '')}`);
+  else if(e.action === 'sync_item'){
+    const st = c.status || [], rg = c.asset_reg_no || [];
+    out.push(`อัปเดตรายการพัสดุ #${escHtml(String(c.item_id || ''))}: สถานะ ${escHtml(trkFmtLogVal('', st[0]))} → ${escHtml(trkFmtLogVal('', st[1]))}`);
+    if(JSON.stringify(rg[0]) !== JSON.stringify(rg[1])) out.push(`ทะเบียนครุภัณฑ์ ${escHtml(trkFmtLogVal('', rg[0]))} → ${escHtml(trkFmtLogVal('', rg[1]))}`);
+  } else if(e.action === 'update'){
+    Object.entries(c).forEach(([k, pair]) => {
+      const [o, n] = Array.isArray(pair) ? pair : [null, pair];
+      if(k === 'step_text' || k === 'step_doc'){
+        const prefix = k === 'step_doc' ? 'เลขที่หนังสือ' : 'ข้อความ';
+        const oo = o || {}, nn = n || {};
+        new Set([...Object.keys(oo), ...Object.keys(nn)]).forEach(sk => {
+          if(oo[sk] !== nn[sk]) out.push(`${prefix} (${escHtml(trkStepLabel(sk))}): ${escHtml(trkFmtLogVal('', oo[sk]))} → ${escHtml(trkFmtLogVal('', nn[sk]))}`);
+        });
+      } else {
+        const label = /_date$/.test(k) ? 'วันที่' + trkStepLabel(k) : (TRK_FIELD_LABEL[k] || k);
+        out.push(`${escHtml(label)}: ${escHtml(trkFmtLogVal(k, o))} → ${escHtml(trkFmtLogVal(k, n))}`);
+      }
+    });
+  }
+  return out;
+}
+async function trkLoadLog(id){
+  const el = () => document.getElementById('trk-log-body');
+  try {
+    const { data, error } = await sb.from('asset_tracking_log').select('*').eq('tracking_id', id).order('id', { ascending:false }).limit(50);
+    if(error) throw error;
+    if(TRK.viewId !== id || !el()) return;
+    const rows = (data || []).slice().sort((a,b) => b.id - a.id).slice(0, 50);
+    el().innerHTML = rows.length ? rows.map(e => `<div class="trk-log-row">
+        <div class="trk-sub">${escHtml(new Date(e.at).toLocaleString('th-TH', { dateStyle:'medium', timeStyle:'short' }))} · ${escHtml(e.by_email || '')}</div>
+        ${trkLogLines(e).map(l => `<div>${l}</div>`).join('')}
+      </div>`).join('')
+      : '<span class="trk-sub">ยังไม่มีประวัติ (เรื่องที่นำเข้าจาก Sheet และการแก้ไขก่อนเปิดระบบประวัติจะไม่แสดง)</span>';
+  } catch(e){ if(TRK.viewId === id && el()) el().innerHTML = '<span class="trk-sub" style="color:var(--danger)">โหลดประวัติไม่ได้</span>'; }
+}
 
 // ─── แก้ไข / เพิ่มเรื่อง (ต้องใช้ PIN เหมือนระบบเดิม) ───
 function trkEdit(id){
@@ -3503,13 +3716,14 @@ function trkRenderEdit(row, base){
         <select class="plain-input" id="trk-e-line"><option value="med" ${r.line!=='other'?'selected':''}>สายแพทย์</option><option value="other" ${r.line==='other'?'selected':''}>สายอื่นๆ</option></select></div>
       ${r.kind==='register' ? inp('acquisition_method','การได้มา', r.acquisition_method) : ''}
     </div>
-    <div class="trk-section-title"><i class="fas fa-route"></i> ขั้นตอน — ใส่วันที่เมื่อขั้นนั้นเสร็จ (ใส่ย้อนหลังได้) · ช่องข้อความใช้เมื่อไม่มีวันที่ เช่น "ได้ DTO แล้ว", "รับโอน"</div>
+    <div class="trk-section-title"><i class="fas fa-route"></i> ขั้นตอน — ใส่วันที่เมื่อขั้นนั้นเสร็จ (ใส่ย้อนหลังได้) · ช่องข้อความใช้เมื่อไม่มีวันที่ เช่น "ได้ DTO แล้ว", "รับโอน" · ไฟล์แนบเพิ่มได้ที่หน้ารายละเอียดเรื่อง</div>
     <div class="trk-tl">${steps.map((s,i)=>`
       <div class="trk-tl-row"><div class="trk-tl-ic">${i+1}</div><div>
         <div style="font-weight:600;font-size:13px">${escHtml(s.l)}</div>
         <div class="trk-tl-edit">
-          <input type="date" class="plain-input" id="trk-d-${s.k}" value="${escHtml(r[s.k]||'')}">
-          <input type="text" class="plain-input" id="trk-t-${s.k}" value="${escHtml(trkStepText(r,s.k))}" placeholder="ข้อความ (ถ้าไม่มีวันที่) — ขึ้นต้นด้วย &quot;รอ&quot; = ยังไม่เสร็จ">
+          <input type="date" class="plain-input" id="trk-d-${s.k}" value="${escHtml(r[s.k]||'')}" title="วันที่">
+          <input type="text" class="plain-input" id="trk-n-${s.k}" value="${escHtml(trkStepDoc(r,s.k))}" placeholder="เลขที่หนังสือ" title="เลขที่หนังสือ">
+          <input type="text" class="plain-input" id="trk-t-${s.k}" value="${escHtml(trkStepText(r,s.k))}" placeholder="ข้อความ (ถ้าไม่มีวันที่) — ขึ้นต้นด้วย &quot;รอ&quot; = ยังไม่เสร็จ" style="grid-column:1/-1">
         </div></div></div>`).join('')}
     </div>
     <div class="form-group full" style="margin-top:12px"><label class="form-label">หมายเหตุ</label>
@@ -3533,7 +3747,7 @@ async function trkSave(){
     asset_reg_no: val('trk-e-asset_reg_no').trim(), sn: val('trk-e-sn').trim(),
     inh_no: val('trk-e-inh_no').trim(), nvh_no: val('trk-e-nvh_no').trim(),
     acquisition_method: base.kind === 'register' ? val('trk-e-acquisition_method').trim() : (base.acquisition_method || ''),
-    note: val('trk-e-note').trim(), step_text: {}
+    note: val('trk-e-note').trim(), step_text: {}, step_doc: {}
   };
   if(!payload.item_name){ errEl.textContent = 'กรุณากรอกชื่อเครื่อง / พัสดุ'; document.getElementById('trk-e-item_name').focus(); return; }
   for(const s of TRK_STEPS[base.kind]){
@@ -3541,6 +3755,8 @@ async function trkSave(){
     if(d && !trkParseDate(d)){ errEl.textContent = 'รูปแบบวันที่ไม่ถูกต้อง: ' + s.l; return; }
     payload[s.k] = d || null;
     if(t) payload.step_text[s.k] = t;
+    const n = val('trk-n-'+s.k).trim();
+    if(n) payload.step_doc[s.k] = n;
   }
   errEl.textContent = '';
   const btn = document.getElementById('trk-save-btn'); if(btn){ btn.disabled = true; btn.style.opacity = '.6'; }
@@ -3616,7 +3832,7 @@ async function trkMaybeSync(r){
     async () => {
       showLoading(true);
       try {
-        const { error } = await sb.rpc('rpc_sync_item_status', { p_item_id: item.id, p_status: statusChange ? target : cur, p_reg_no: regChange ? regNo : null, p_pin: PIN_CORRECT });
+        const { error } = await sb.rpc('rpc_sync_item_status', { p_item_id: item.id, p_status: statusChange ? target : cur, p_reg_no: regChange ? regNo : null, p_pin: PIN_CORRECT, p_tracking_id: r.id });
         if(error) throw error;
         delete S.allItems[item.category_id]; S.dashStats = null; S.dashExtra = null;
         if(S.currentCat && S.currentCat.id === item.category_id && document.getElementById('view-table').style.display !== 'none') await loadCategoryItems(S.currentCat);
@@ -3638,8 +3854,13 @@ function trkAskDelete(id){
       async () => {
         showLoading(true);
         try {
-          const { error } = await sb.rpc('rpc_delete_tracking', { p_id: id, p_pin: PIN_CORRECT });
+          const { data: paths, error } = await sb.rpc('rpc_delete_tracking', { p_id: id, p_pin: PIN_CORRECT });
           if(error) throw error;
+          // ลบไฟล์แนบใน Storage ต่อ (metadata ถูกลบแล้ว จึงลบได้ตาม policy) — ถ้าไม่สำเร็จ ไฟล์จะค้างแต่ไม่กระทบข้อมูล
+          if(Array.isArray(paths) && paths.length){
+            try { const { error: se } = await sb.storage.from(TRK_BUCKET).remove(paths); if(se) throw se; }
+            catch(e){ toast('ลบเรื่องแล้ว แต่ลบไฟล์แนบบางไฟล์ไม่สำเร็จ: ' + e.message, 'error'); }
+          }
           TRK.rows = TRK.rows.filter(x => x.id !== id); trkIndex();
           trkCloseModal(); toast('ลบเรื่องสำเร็จ', 'success');
           trkRenderDash(); trkRerender(); trkRefreshItemTable();
@@ -3711,6 +3932,33 @@ function trkStartFromItem(itemId, kind){
   if(kind !== 'register') pre.acquisition_method = '';
   trkClosePick();
   requirePin('เริ่มเรื่อง' + TRK_KIND_LABEL[kind], () => trkRenderEdit(null, Object.assign({ kind }, pre)));
+}
+
+/** ทิศกลับ: หลังบันทึกรายการพัสดุ ถ้าสถานะเปลี่ยนเข้ากลุ่ม ชำรุด/ระหว่างจำหน่าย หรือ รอขึ้นทะเบียน
+ *  และเครื่องยังไม่มีเรื่องประเภทนั้น → ถามว่าจะเปิดเรื่องไหม (ไม่เปิดเองอัตโนมัติ)
+ *  ไม่ถาม PIN ซ้ำ เพราะเพิ่งยืนยัน PIN ตอนบันทึก (กันปัญหา PIN ซ้อน) — การบันทึกเรื่องยังตรวจ PIN ที่ server ตามปกติ */
+function trkAfterItemSave(prev, newStatus){
+  if(!TRK.loaded || !prev || !newStatus) return;
+  const g = trkStatusGroup(newStatus), pg = trkStatusGroup(prev.status);
+  if(g === pg) return;
+  let kind = null;
+  if(g === 'broken' || g === 'wait') kind = 'dispose';
+  else if(String(newStatus).includes('รอขึ้นทะเบียน')) kind = 'register';
+  if(!kind) return;
+  if((TRK.byItem[prev.id] || []).some(r => r.kind === kind)) return;
+  const cat = S.categories.find(c => c.id === prev.catId);
+  const item = cat ? (S.allItems[cat.id] || []).find(i => i.id === prev.id) : null;
+  if(!cat || !item) return;
+  trkConfirm(`<i class="fas fa-route" style="color:#d97706"></i> เปิดเรื่อง${TRK_KIND_LABEL[kind]}ไหม?`,
+    `<p style="font-size:13px;color:var(--text-muted);margin-bottom:10px">สถานะของรายการพัสดุ <b>#${item.id}</b> เปลี่ยนเป็น
+       <span class="status-badge ${getStCls(newStatus)}">${escHtml(newStatus)}</span> แต่ยังไม่มีเรื่อง${TRK_KIND_LABEL[kind]}ในระบบติดตาม</p>
+     <p style="font-size:12px;color:var(--text-muted)">กด "เปิดเรื่อง" เพื่อเริ่มกรอกขั้นตอน (ระบบดึงข้อมูลเครื่องให้) หรือ "ไม่ต้อง" เพื่อข้ามไป</p>`,
+    'เปิดเรื่อง', 'ไม่ต้อง',
+    () => {
+      const pre = trkPrefillFromItem(item, cat);
+      if(kind !== 'register'){ delete pre.received_date; pre.acquisition_method = ''; }
+      trkRenderEdit(null, Object.assign({ kind }, pre));
+    });
 }
 
 /** จากเรื่อง → เปิดตารางหมวดของเครื่อง และค้นหาเครื่องนั้นให้ */
@@ -3854,6 +4102,57 @@ function trkRenderBigDash(){
     .map(([k,v]) => [k, v, trkDashItem('ครุภัณฑ์ — ' + k, r => ((r.item_name||'').trim() || 'ไม่ระบุ') === k)]));
 }
 
+/** รายงานสรุปขึ้นทะเบียน/จำหน่าย (PDF) — ใช้เทคนิคเดียวกับ exportDashboardPDF เดิม: เปิดหน้าต่างใหม่ + window.print() ด้วยฟอนต์ Sarabun */
+function trkExportDashPDF(){
+  if(!TRK.loaded){ toast('ยังโหลดข้อมูลไม่เสร็จ', 'error'); return; }
+  const all = TRK.rows.map(r => ({ r, p: trkProgress(r) }));
+  const reg = all.filter(x => x.r.kind === 'register'), dis = all.filter(x => x.r.kind === 'dispose');
+  const c = (arr, f) => arr.filter(x => f(x.r, x.p)).length;
+  const tbl = (head, rows) => `<table><thead><tr>${head.map(h => `<th>${escHtml(h)}</th>`).join('')}</tr></thead><tbody>${
+    rows.length ? rows.map(r => `<tr>${r.map(v => `<td>${escHtml(String(v))}</td>`).join('')}</tr>`).join('') : `<tr><td colspan="${head.length}" style="text-align:center;color:#888">ไม่มีข้อมูล</td></tr>`}</tbody></table>`;
+  const summary = tbl(['หัวข้อ','ขึ้นทะเบียน','จำหน่าย'], [
+    ['ทั้งหมด', reg.length, dis.length],
+    ['สายแพทย์', c(reg, r => r.line !== 'other'), c(dis, r => r.line !== 'other')],
+    ['สายอื่นๆ', c(reg, r => r.line === 'other'), c(dis, r => r.line === 'other')],
+    ['เสร็จแล้ว', c(reg, (r,p) => p.complete), c(dis, (r,p) => p.complete)],
+    ['กำลังดำเนินการ', c(reg, (r,p) => !p.complete), c(dis, (r,p) => !p.complete)],
+    ['ค้างเกิน ' + TRK_AGE_BAD + ' วัน', c(reg, (r,p) => !p.complete && p.days !== null && p.days > TRK_AGE_BAD), c(dis, (r,p) => !p.complete && p.days !== null && p.days > TRK_AGE_BAD)]
+  ]);
+  const stageTbl = (kind, arr) => tbl(['ขั้นที่รอ','จำนวนเรื่อง'], TRK_STEPS[kind].map((s,i) => ['รอ' + s.l, arr.filter(x => !x.p.complete && x.p.waitIdx === i).length]).filter(r => r[1] > 0));
+  const fyMap = {};
+  const addFy = (arr, field, col) => arr.forEach(x => { if(!x.r[field]) return; const fy = getFiscalYear(x.r[field]); if(!fy) return;
+    fyMap[fy] = fyMap[fy] || [0,0,0,0]; fyMap[fy][col + (x.r.line === 'other' ? 1 : 0)]++; });
+  addFy(reg, 'reg_record_date', 0); addFy(dis, 'dispose_record_date', 2);
+  const fyTbl = tbl(['ปีงบประมาณ','ขึ้นทะเบียน สายแพทย์','ขึ้นทะเบียน สายอื่นๆ','จำหน่าย สายแพทย์','จำหน่าย สายอื่นๆ'],
+    Object.keys(fyMap).sort().map(fy => [fy].concat(fyMap[fy])));
+  const old = all.filter(x => !x.p.complete && x.p.days !== null && x.p.days > TRK_AGE_BAD).sort(trkSortCmp);
+  const oldTbl = tbl(['#','ประเภท','เครื่อง/พัสดุ','ทะเบียนครุภัณฑ์','ขั้นที่รอ','ค้าง (วัน)'],
+    old.map((x,i) => [i+1, TRK_KIND_LABEL[x.r.kind], x.r.item_name, x.r.asset_reg_no || '—', trkStageText(x.p), x.p.days]));
+  const win = window.open('', '_blank');
+  if(!win){ toast('เบราว์เซอร์บล็อกหน้าต่างใหม่ — กรุณาอนุญาต popup', 'error'); return; }
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box} body{font-family:'Sarabun',sans-serif;font-size:12px;color:#1e293b;padding:24px}
+  h1{font-size:18px;margin:0 0 4px} h2{font-size:14px;margin:18px 0 6px;color:#1a56db}
+  .sub{color:#64748b;font-size:11px;margin-bottom:12px}
+  table{width:100%;border-collapse:collapse;margin-bottom:6px} th{background:#1a56db;color:#fff;padding:5px 8px;text-align:left;font-size:11px}
+  td{padding:4px 8px;border-bottom:1px solid #e2e8f0;font-size:11px} tr:nth-child(even) td{background:#f8fafc}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media print{ body{padding:0} h2{break-after:avoid} tr{break-inside:avoid} }
+</style></head><body>
+<h1>รายงานสรุปการขึ้นทะเบียน / จำหน่ายครุภัณฑ์</h1>
+<div class="sub">แผนกบริการเครื่องมือแพทย์ | วันที่พิมพ์: ${escHtml(new Date().toLocaleDateString('th-TH', { dateStyle:'long' }))} | ขั้นตอนและวันค้างคำนวณจากวันที่ที่บันทึกในแต่ละเรื่อง</div>
+<h2>ภาพรวม</h2>${summary}
+<div class="two"><div><h2>จำหน่าย — เรื่องที่ค้างแยกตามขั้น</h2>${stageTbl('dispose', dis)}</div><div><h2>ขึ้นทะเบียน — เรื่องที่ค้างแยกตามขั้น</h2>${stageTbl('register', reg)}</div></div>
+<h2>เรื่องที่เสร็จ แยกตามปีงบประมาณ (ตามวันที่บันทึกขึ้นทะเบียน / บันทึกจำหน่าย)</h2>${fyTbl}
+<h2>เรื่องที่ค้างเกิน ${TRK_AGE_BAD} วัน (${old.length} เรื่อง)</h2>${oldTbl}
+<script>window.onload=()=>setTimeout(()=>window.print(),400)<\/script>
+</body></html>`);
+  win.document.close();
+}
+
 // ─── หน้าต่างรายการ (drill-down) ───
 function trkDrillIdx(i){
   const d = TRK.dashItems[i]; if(!d) return;
@@ -3868,7 +4167,7 @@ function trkDrillRows(){
   const q = document.getElementById('trk-drill-search').value.trim().toLowerCase();
   return TRK.rows.map(r => ({ r, p: trkProgress(r) }))
     .filter(x => TRK.drill.pred(x.r, x.p))
-    .filter(x => !q || TRK_TEXT_FIELDS.map(f => x.r[f]||'').concat(Object.values(x.r.step_text||{})).join(' ').toLowerCase().includes(q))
+    .filter(x => !q || TRK_TEXT_FIELDS.map(f => x.r[f]||'').concat(Object.values(x.r.step_text||{}), Object.values(x.r.step_doc||{})).join(' ').toLowerCase().includes(q))
     .sort(trkSortCmp);
 }
 function trkRenderDrill(){
@@ -3910,10 +4209,12 @@ function trkExport(type){
   const headers = ['ประเภท','สาย','ชื่อเครื่อง/พัสดุ','คุณลักษณะ/คุณสมบัติ','หมายเลขทะเบียนครุภัณฑ์','S/N','INH No.','NVH No.']
     .concat(kind === 'register' ? ['การได้มา'] : [])
     .concat(steps.map(s => s.l))
+    .concat(steps.map(s => 'เลขที่หนังสือ: ' + s.l))
     .concat(['ขั้นปัจจุบัน','ค้าง (วัน)','ปีงบฯ ที่เสร็จ','รายการพัสดุ (id)','หมายเหตุ']);
   const rows = TRK.filtered.map(({r,p}) => [TRK_KIND_LABEL[r.kind], TRK_LINE_LABEL[r.line]||r.line, r.item_name, r.spec, r.asset_reg_no, r.sn, r.inh_no, r.nvh_no]
     .concat(kind === 'register' ? [r.acquisition_method] : [])
     .concat(steps.map(s => r[s.k] || trkStepText(r, s.k)))
+    .concat(steps.map(s => trkStepDoc(r, s.k)))
     .concat([trkStageText(p), p.days === null ? '' : p.days, p.fy || '', r.item_id || '', r.note])
     .map(v => csvSafe(v === null || v === undefined ? '' : String(v))));
   const name = 'ติดตาม' + TRK_KIND_LABEL[kind] + '_' + trkYmd(new Date());
