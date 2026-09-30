@@ -315,6 +315,41 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
 .btn-theme-sidebar:hover{background:rgba(255,255,255,.14);color:#fff}
 .btn-theme-top{width:38px;height:38px;border-radius:9px;border:1.5px solid var(--border);background:var(--card);color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .2s;flex-shrink:0}
 .btn-theme-top:hover{border-color:var(--primary);color:var(--primary)}
+/* ── TRK: ติดตามขึ้นทะเบียน/จำหน่าย (ตาราง asset_tracking) ── */
+.trk-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.trk-tab{padding:8px 16px;border-radius:8px;border:1.5px solid var(--border);background:var(--card);color:var(--text-muted);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+.trk-tab:hover{border-color:var(--primary);color:var(--primary)}
+.trk-tab.active{background:var(--primary);border-color:var(--primary);color:#fff}
+.trk-stage-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.trk-stage{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;transition:all .15s}
+.trk-stage:hover,.trk-stage.active{border-color:var(--warning)}
+.trk-stage .l{font-size:11px;color:var(--text-muted);font-weight:600}
+.trk-stage .v{font-size:20px;font-weight:700;color:#d97706;line-height:1.3}
+.trk-dots{display:inline-flex;gap:3px;vertical-align:middle}
+.trk-dot{width:11px;height:11px;border-radius:50%;border:1.5px solid var(--border);background:transparent;display:inline-block}
+.trk-dot.done{background:var(--success);border-color:var(--success)}
+.trk-dot.wait{background:var(--warning);border-color:var(--warning)}
+.trk-dot.gap{background:transparent;border-color:var(--danger);border-style:dashed}
+.trk-age{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+.trk-age.ok{background:#dcfce7;color:#15803d}.trk-age.warn{background:#fef3c7;color:#92400e}.trk-age.bad{background:#fee2e2;color:#b91c1c}.trk-age.na{background:#f1f5f9;color:#64748b}
+.trk-pill{display:inline-block;margin-left:5px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap;background:#fef3c7;color:#92400e;cursor:pointer;border:1px solid #fcd34d}
+.trk-pill:hover{background:#fde68a}
+.trk-sub{font-size:11px;color:var(--text-muted)}
+.trk-link{color:var(--primary);cursor:pointer;font-weight:600}
+.trk-link:hover{text-decoration:underline}
+.trk-tl{display:flex;flex-direction:column;gap:2px}
+.trk-tl-row{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:start;padding:7px 0;border-bottom:1px dashed var(--border)}
+.trk-tl-row:last-child{border-bottom:none}
+.trk-tl-ic{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:1.5px solid var(--border);color:var(--text-muted)}
+.trk-tl-ic.done{background:#dcfce7;border-color:#86efac;color:#15803d}
+.trk-tl-ic.wait{background:#fef3c7;border-color:#fcd34d;color:#b45309}
+.trk-tl-ic.gap{border-color:var(--danger);border-style:dashed;color:var(--danger)}
+.trk-tl-main{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:space-between}
+.trk-tl-edit{display:grid;grid-template-columns:150px 1fr;gap:8px;margin-top:6px}
+.trk-section-title{font-size:12px;font-weight:700;color:var(--text-muted);margin:16px 0 8px;text-transform:none;display:flex;align-items:center;gap:6px}
+.trk-info{font-size:12px;color:var(--text-muted);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin-bottom:12px;line-height:1.6}
+.trk-choice{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;margin-bottom:10px;background:var(--bg)}
+.trk-choice .t{flex:1;min-width:0}
 </style>
 </head>
 <body>
@@ -355,6 +390,19 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
       <div class="sidebar-section-label">ภาพรวม</div>
       <div class="nav-item active" onclick="showDashboard()" id="nav-dashboard">
         <span class="nav-icon"><i class="fas fa-chart-pie"></i></span><span>Dashboard</span>
+      </div>
+    </div>
+    <!-- TRK: เมนูติดตามขึ้นทะเบียน/จำหน่าย -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">ติดตามทะเบียน / จำหน่าย</div>
+      <div class="nav-item" onclick="trkShow('dash')" id="nav-trk-dash">
+        <span class="nav-icon"><i class="fas fa-chart-column"></i></span><span>Dashboard ทะเบียน/จำหน่าย</span>
+      </div>
+      <div class="nav-item" onclick="trkShow('dispose')" id="nav-trk-dispose">
+        <span class="nav-icon"><i class="fas fa-box-archive"></i></span><span>ติดตามจำหน่าย</span>
+      </div>
+      <div class="nav-item" onclick="trkShow('register')" id="nav-trk-register">
+        <span class="nav-icon"><i class="fas fa-file-signature"></i></span><span>ติดตามขึ้นทะเบียน</span>
       </div>
     </div>
     <div class="sidebar-section">
@@ -402,6 +450,11 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
 
         <div id="dash-content">
           <div class="stat-grid" id="stat-grid"></div>
+          <!-- TRK: การ์ดสรุปงานขึ้นทะเบียน/จำหน่ายบน Dashboard -->
+          <div class="chart-card" style="margin-bottom:16px" id="trk-dash-card">
+            <div class="chart-title"><i class="fas fa-route" style="color:#d97706"></i> ติดตามขึ้นทะเบียน / จำหน่าย <span style="font-size:11px;color:var(--text-muted);font-weight:400;margin-left:6px">คลิกเพื่อดูรายการ</span></div>
+            <div id="trk-dash-body"><div style="color:var(--text-muted);font-size:12px;text-align:center;padding:12px 0">กำลังโหลด...</div></div>
+          </div>
           <div class="chart-card" style="margin-bottom:16px">
             <div class="chart-title"><i class="fas fa-chart-bar" style="color:var(--primary)"></i> จำนวนพัสดุแต่ละประเภท <span style="font-size:11px;color:var(--text-muted);font-weight:400;margin-left:6px">ครบทุกประเภท — คลิกดูรายการ</span></div>
             <div class="bar-chart" id="chart-sheets"></div>
@@ -499,6 +552,133 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
           </div>
         </div>
       </div>
+
+      <!-- TRK: หน้าติดตามขึ้นทะเบียน/จำหน่าย -->
+      <div id="view-tracking" style="display:none">
+        <div class="trk-tabs">
+          <button class="trk-tab" id="trk-tab-dash" onclick="trkShow('dash')"><i class="fas fa-chart-pie"></i> Dashboard</button>
+          <button class="trk-tab" id="trk-tab-dispose" onclick="trkShow('dispose')"><i class="fas fa-box-archive"></i> จำหน่าย</button>
+          <button class="trk-tab" id="trk-tab-register" onclick="trkShow('register')"><i class="fas fa-file-signature"></i> ขึ้นทะเบียน</button>
+          <div style="flex:1"></div>
+          <button class="btn btn-ghost btn-sm" onclick="trkReload(true)"><i class="fas fa-sync-alt"></i> โหลดใหม่</button>
+          <button class="btn btn-success btn-sm" onclick="trkOpenNew()" id="trk-btn-new"><i class="fas fa-plus"></i> เพิ่มเรื่องใหม่</button>
+        </div>
+        <!-- TRK: Dashboard ทะเบียน/จำหน่าย (รูปแบบเดียวกับระบบ Google Sheet เดิม) -->
+        <div id="trk-dash-view" style="display:none">
+          <div class="trk-info" id="trk-bd-header" style="font-size:13px"></div>
+          <div class="trk-section-title"><i class="fas fa-chart-simple"></i> ภาพรวม</div>
+          <div class="stat-grid" id="trk-bd-row1"></div>
+          <div class="trk-section-title"><i class="fas fa-list-check"></i> สถานะขึ้นทะเบียน / จำหน่าย</div>
+          <div class="stat-grid" id="trk-bd-row2"></div>
+          <div class="chart-grid">
+            <div class="chart-card"><div class="chart-title"><i class="fas fa-hand-holding-heart" style="color:#059669"></i> การได้มาของครุภัณฑ์ <span class="trk-sub" style="font-weight:400">คลิกดูรายการ</span></div><div id="trk-bd-source"></div></div>
+            <div class="chart-card"><div class="chart-title"><i class="fas fa-circle-notch" style="color:var(--primary)"></i> สถานะการขึ้นทะเบียน <span class="trk-sub" style="font-weight:400">คลิกดูรายการ</span></div><div id="trk-bd-regstage"></div></div>
+          </div>
+          <div class="chart-grid">
+            <div class="chart-card"><div class="chart-title"><i class="fas fa-calendar-day" style="color:#3b82f6"></i> สถานะขอขึ้นทะเบียนรายเดือน <span class="trk-sub" style="font-weight:400">ตามวันที่รับมา</span></div><div class="bar-chart" id="trk-bd-mreg"></div></div>
+            <div class="chart-card"><div class="chart-title"><i class="fas fa-calendar-day" style="color:#f59e0b"></i> สถานะขอจำหน่ายรายเดือน <span class="trk-sub" style="font-weight:400">ตามวันที่ขอจำหน่าย</span></div><div class="bar-chart" id="trk-bd-msold"></div></div>
+          </div>
+          <div class="chart-grid">
+            <div class="chart-card"><div class="chart-title"><i class="fas fa-calendar-alt" style="color:#7c3aed"></i> ขึ้นทะเบียนรายปีงบประมาณ (วันอนุมัติขึ้นทะเบียน)</div><div class="bar-chart" id="trk-bd-fyreg"></div></div>
+            <div class="chart-card"><div class="chart-title"><i class="fas fa-calendar-alt" style="color:#7c3aed"></i> จำหน่ายรายปีงบประมาณ (วันที่อนุมัติจำหน่าย)</div><div class="bar-chart" id="trk-bd-fysold2"></div></div>
+          </div>
+          <div class="chart-grid">
+            <div class="chart-card"><div class="chart-title"><i class="fas fa-calendar-check" style="color:#7c3aed"></i> ขึ้นทะเบียนรายปีงบประมาณ (วันที่บันทึกขึ้นทะเบียน)</div><div class="bar-chart" id="trk-bd-fyreg2"></div></div>
+            <div class="chart-card"><div class="chart-title"><i class="fas fa-calendar-check" style="color:#7c3aed"></i> จำหน่ายรายปีงบประมาณ (วันที่บันทึกจำหน่าย)</div><div class="bar-chart" id="trk-bd-fysold"></div></div>
+          </div>
+          <div class="chart-card" style="margin-bottom:16px"><div class="chart-title"><i class="fas fa-ranking-star" style="color:#d97706"></i> ครุภัณฑ์ที่บันทึกมากที่สุด Top 10 <span class="trk-sub" style="font-weight:400">นับทั้งขึ้นทะเบียนและจำหน่าย</span></div><div class="bar-chart" id="trk-bd-top"></div></div>
+        </div>
+        <div id="trk-list-view">
+        <div class="stat-grid" id="trk-stat-grid"></div>
+        <div class="trk-stage-row" id="trk-stage-row"></div>
+        <div class="toolbar">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="trk-search" placeholder="ค้นหา ชื่อ / ทะเบียน / S/N / INH / NVH / หมายเหตุ..." oninput="trkApply()">
+          </div>
+          <select class="filter-select" id="trk-f-line" onchange="trkApply()">
+            <option value="">-- ทุกสาย --</option><option value="med">สายแพทย์</option><option value="other">สายอื่นๆ</option>
+          </select>
+          <select class="filter-select" id="trk-f-stage" onchange="trkApply()"></select>
+          <select class="filter-select" id="trk-f-fy" onchange="trkApply()"></select>
+          <select class="filter-select" id="trk-f-link" onchange="trkApply()">
+            <option value="">-- ทุกเรื่อง --</option><option value="linked">เชื่อมกับรายการพัสดุ</option><option value="unlinked">ไม่มีในรายการพัสดุ</option>
+          </select>
+          <div class="export-group">
+            <button class="btn btn-ghost btn-sm" onclick="trkExport('csv')"><i class="fas fa-file-csv"></i> CSV</button>
+            <button class="btn btn-ghost btn-sm" onclick="trkExport('xlsx')"><i class="fas fa-file-excel"></i> XLSX</button>
+          </div>
+        </div>
+        <div class="table-container">
+          <div class="table-header">
+            <h3 id="trk-table-title">รายการเรื่อง</h3>
+            <span class="record-count" id="trk-count"></span>
+          </div>
+          <div class="table-wrap">
+            <table><thead id="trk-thead"></thead><tbody id="trk-tbody"></tbody></table>
+          </div>
+          <div class="pagination">
+            <div class="info" id="trk-page-info"></div>
+            <div class="page-btns" id="trk-page-btns"></div>
+          </div>
+        </div>
+        </div><!-- /trk-list-view -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TRK: หน้าต่างรายการจาก Dashboard (drill-down) — อยู่ก่อน trk-overlay เพื่อให้หน้าต่างเรื่องเปิดทับได้ -->
+<div class="modal-overlay" id="trk-drill-overlay">
+  <div class="modal" style="max-width:1000px">
+    <div class="modal-header">
+      <h2 id="trk-drill-title">รายการ</h2>
+      <span class="record-count" id="trk-drill-count" style="margin-left:auto;margin-right:8px"></span>
+      <button class="modal-close" onclick="trkCloseDrill()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" style="padding:0">
+      <div class="sm-search"><i class="fas fa-search"></i><input type="text" id="trk-drill-search" placeholder="ค้นหาในรายการนี้..." oninput="trkRenderDrill()"></div>
+      <div style="overflow-x:auto"><table><thead id="trk-drill-thead"></thead><tbody id="trk-drill-tbody"></tbody></table></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="trkExportDrill()"><i class="fas fa-file-csv"></i> CSV</button>
+      <button class="btn btn-ghost" onclick="trkCloseDrill()">ปิด</button>
+    </div>
+  </div>
+</div>
+<!-- TRK: หน้าต่างดู/แก้ไขเรื่อง -->
+<div class="modal-overlay" id="trk-overlay">
+  <div class="modal" style="max-width:820px">
+    <div class="modal-header">
+      <h2 id="trk-modal-title">เรื่อง</h2>
+      <button class="modal-close" onclick="trkCloseModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="trk-modal-body"></div>
+    <div class="modal-footer" id="trk-modal-footer"></div>
+  </div>
+</div>
+
+<!-- TRK: หน้าต่างเลือก (จากแถวรายการพัสดุ) และหน้าต่างยืนยัน -->
+<div class="modal-overlay" id="trk-pick-overlay">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header">
+      <h2><i class="fas fa-route" style="color:#d97706"></i> ติดตามขึ้นทะเบียน / จำหน่าย</h2>
+      <button class="modal-close" onclick="trkClosePick()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="trk-pick-body"></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="trkClosePick()">ปิด</button></div>
+  </div>
+</div>
+<div class="modal-overlay" id="trk-confirm-overlay">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <h2 id="trk-confirm-title">ยืนยัน</h2>
+      <button class="modal-close" onclick="trkConfirmClose()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="trk-confirm-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="trkConfirmClose()" id="trk-confirm-no">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="trkConfirmYes()" id="trk-confirm-yes">ยืนยัน</button>
     </div>
   </div>
 </div>
@@ -1263,6 +1443,7 @@ async function init(){
     document.getElementById('empty-categories').style.display = 'none';
     document.getElementById('dash-content').style.display = '';
     await loadDashboard();
+    trkReload(false); // TRK: โหลดข้อมูลติดตามขึ้นทะเบียน/จำหน่าย (ไม่บล็อกหน้า)
   } catch(e){
     showLoading(false);
     toast('เชื่อมต่อ Supabase ไม่ได้: '+e.message,'error');
@@ -1281,6 +1462,7 @@ function setActiveNav(id){ document.querySelectorAll('.nav-item').forEach(el=>el
 async function showDashboard(){
   document.getElementById('view-dashboard').style.display='';
   document.getElementById('view-table').style.display='none';
+  document.getElementById('view-tracking').style.display='none'; // TRK
   document.getElementById('page-title').textContent='Dashboard';
   document.getElementById('page-subtitle').textContent='ภาพรวมรายการพัสดุทั้งหมด';
   S.currentCat=null; setActiveNav('nav-dashboard');
@@ -1903,6 +2085,7 @@ async function showCategory(catId, navIdx){
   S.currentCat = cat; S.currentNavIdx = navIdx;
   document.getElementById('view-dashboard').style.display='none';
   document.getElementById('view-table').style.display='';
+  document.getElementById('view-tracking').style.display='none'; // TRK
   document.getElementById('page-title').textContent = cat.name;
   document.getElementById('page-subtitle').textContent = 'รายการพัสดุ: ' + cat.name;
   document.getElementById('table-title').textContent = cat.name;
@@ -1991,7 +2174,7 @@ function renderTableBody(headers, rawQ){
       const isRemain = i === remainIdx;
       return `<th class="${S.sortCol===i?'sorted':''}" onclick="sortTable(${i})" style="min-width:110px${isRemain?';background:#f0fdf4;color:#059669':''}">${escHtml(h)}${isRemain?' <i class="fas fa-magic" style="font-size:9px;opacity:.6" title="คำนวณอัตโนมัติ"></i>':''} <i class="fas ${icon} si"></i></th>`;
     }).join('')}
-    <th style="width:90px;min-width:90px">จัดการ</th>
+    <th style="width:124px;min-width:124px">จัดการ</th>
   </tr>`;
 
   document.getElementById('table-body').innerHTML = pageRows.length ? pageRows.map((it,ri)=>{
@@ -2001,7 +2184,7 @@ function renderTableBody(headers, rawQ){
         const val = (it.data && it.data[h] !== undefined && it.data[h] !== null) ? String(it.data[h]) : '';
 
         // คอลัมน์สถานะ
-        if(ci === sk){ const nv = normalizeStatus(val); if(nv) return `<td><span class="status-badge ${getStCls(nv)}">${escHtml(nv)}</span></td>`; return `<td></td>`; }
+        if(ci === sk){ const nv = normalizeStatus(val); const tp = trkItemPills(it.id); /* TRK */ if(nv) return `<td><span class="status-badge ${getStCls(nv)}">${escHtml(nv)}</span>${tp}</td>`; return `<td>${tp}</td>`; }
 
         // คอลัมน์อายุคงเหลือ — คำนวณ real-time เสมอ ไม่ใช้ค่าเก่าจาก DB
         if(ci === remainIdx && lifespanIdx >= 0 && dateIdx >= 0){
@@ -2027,6 +2210,7 @@ function renderTableBody(headers, rawQ){
         <div class="td-actions">
           <button class="btn btn-outline btn-sm btn-icon" onclick="openEditModal(${it.id})" title="แก้ไข"><i class="fas fa-edit"></i></button>
           <button class="btn btn-danger btn-sm btn-icon" onclick="openDelModal(${it.id})" title="ลบ"><i class="fas fa-trash"></i></button>
+          <button class="btn btn-ghost btn-sm btn-icon" onclick="trkOpenPick(${it.id})" title="ติดตามขึ้นทะเบียน/จำหน่าย"><i class="fas fa-route"></i></button>
         </div>
       </td>
     </tr>`;
@@ -2653,6 +2837,7 @@ async function refreshData(){
   S.allItems = {}; S.dashStats = null; S.dashExtra = null;
   const { data } = await sb.from('categories').select('*').order('display_order').order('name');
   S.categories = data || []; buildSidebarNav();
+  trkReload(false); // TRK
   toast('รีเฟรชแล้ว','success');
   if(S.currentCat){ const fresh = S.categories.find(c=>c.id===S.currentCat.id); if(fresh){ S.currentCat=fresh; await loadCategoryItems(fresh); } else await showDashboard(); }
   else await loadDashboard();
@@ -2930,6 +3115,818 @@ function highlightMatch(val, q, mode){
   return `${escHtml(val.substring(0,idx))}<mark class="search-highlight">${escHtml(val.substring(idx,idx+q.length))}</mark>${escHtml(val.substring(idx+q.length))}`;
 }
 function clearSearch(){ document.getElementById('search-input').value=''; document.getElementById('btn-clear-search').style.display='none'; applyFilters(); }
+
+// ════════════════════════════════════════════════════════════════════════════
+// TRK: ระบบติดตามขึ้นทะเบียน/จำหน่ายครุภัณฑ์ (ตาราง asset_tracking)
+//  - อ่านข้อมูลด้วย select (RLS: authenticated เท่านั้น)
+//  - เขียนผ่าน RPC ที่ตรวจ PIN ฝั่ง server: rpc_upsert_tracking / rpc_delete_tracking / rpc_sync_item_status
+//  - ขั้นปัจจุบัน / วันค้าง / ปีงบฯ คำนวณตอนแสดงผลเสมอ ไม่เก็บลงฐานข้อมูล (กันข้อมูลค้างเก่า)
+//  - ขั้นที่ "เสร็จ" = มีวันที่ หรือมีข้อความที่ไม่ได้ขึ้นต้นด้วย "รอ"/"ค้าง" (เช่น "ได้ DTO แล้ว", "รับโอน")
+// ════════════════════════════════════════════════════════════════════════════
+const TRK_STEPS = {
+  dispose: [
+    { k:'repair_request_date',  l:'ขอซ่อมทำ' },
+    { k:'dispose_request_date', l:'ขอจำหน่าย' },
+    { k:'fact_report_date',     l:'รายงานผลสอบข้อเท็จจริง' },
+    { k:'carcass_return_date',  l:'คืนซาก' },
+    { k:'dispose_approve_date', l:'อนุมัติจำหน่าย' },
+    { k:'dispose_record_date',  l:'บันทึกจำหน่าย' }
+  ],
+  register: [
+    { k:'received_date',    l:'รับมา' },
+    { k:'dto_date',         l:'ได้ DTO' },
+    { k:'reg_report_date',  l:'รายงานขึ้นทะเบียน' },
+    { k:'reg_approve_date', l:'อนุมัติขึ้นทะเบียน' },
+    { k:'reg_record_date',  l:'บันทึกขึ้นทะเบียน' }
+  ]
+};
+const TRK_KIND_LABEL = { dispose:'จำหน่าย', register:'ขึ้นทะเบียน' };
+const TRK_LINE_LABEL = { med:'สายแพทย์', other:'สายอื่นๆ' };
+const TRK_AGE_WARN = 90, TRK_AGE_BAD = 180; // จำนวนวันที่ค้างในขั้นปัจจุบัน
+const TRK_TEXT_FIELDS = ['item_name','spec','asset_reg_no','sn','inh_no','nvh_no','acquisition_method','note'];
+
+const TRK = { rows:[], byItem:{}, loaded:false, kind:'dispose', mode:'list', filtered:[], page:1, ps:50,
+  editRow:null, editBase:null, confirmFn:null, dashItems:[], drill:null };
+
+// ─── helpers ───
+function trkParseDate(s){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s||''));
+  return m ? new Date(+m[1], +m[2]-1, +m[3]) : null;
+}
+function trkToday(){ const d = new Date(); d.setHours(0,0,0,0); return d; }
+function trkYmd(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function trkFmtDate(s){ const d = trkParseDate(s); return d ? d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric'}) : ''; }
+function trkClean(v){ let s = String(v === undefined || v === null ? '' : v).trim(); if(/^\d+\.0$/.test(s)) s = s.slice(0,-2); return s; }
+function trkStepText(r,k){ return String((r.step_text||{})[k]||'').trim(); }
+function trkStepDone(r,k){ if(r[k]) return true; const t = trkStepText(r,k); return !!t && !/^(รอ|ค้าง)/.test(t); }
+
+/** คำนวณความคืบหน้าของ 1 เรื่อง (ไม่เก็บลง DB) */
+function trkProgress(r){
+  const steps = TRK_STEPS[r.kind] || [];
+  const done = steps.map(s => trkStepDone(r, s.k));
+  let last = -1; done.forEach((d,i)=>{ if(d) last = i; });
+  const complete = steps.length > 0 && last === steps.length - 1;
+  const waitIdx = complete ? -1 : last + 1;
+  const gaps = []; for(let i=0;i<last;i++){ if(!done[i]) gaps.push(i); }
+  let since = null; steps.forEach(s => { const d = trkParseDate(r[s.k]); if(d && (!since || d > since)) since = d; });
+  const days = (!complete && since) ? Math.round((trkToday() - since) / 86400000) : null;
+  const endDate = complete ? (r[steps[steps.length-1].k] || null) : null;
+  const fy = endDate ? getFiscalYear(endDate) : null;
+  return { steps, done, last, complete, waitIdx, gaps, since, days, endDate, fy };
+}
+function trkAgeHtml(p){
+  if(p.complete) return `<span class="trk-age ok">เสร็จแล้ว</span>`;
+  if(p.days === null) return `<span class="trk-age na" title="ยังไม่มีวันที่ของขั้นที่ทำแล้ว">—</span>`;
+  const cls = p.days > TRK_AGE_BAD ? 'bad' : p.days > TRK_AGE_WARN ? 'warn' : 'ok';
+  return `<span class="trk-age ${cls}" title="นับจากวันที่ล่าสุดที่บันทึก: ${escHtml(trkYmd(p.since))}">${p.days} วัน</span>`;
+}
+function trkDotsHtml(p){
+  return `<span class="trk-dots">${p.steps.map((s,i)=>{
+    const cls = p.done[i] ? 'done' : (i === p.waitIdx ? 'wait' : (p.gaps.includes(i) ? 'gap' : ''));
+    const tip = s.l + (p.done[i] ? ' — เสร็จ' : i === p.waitIdx ? ' — กำลังรอ' : p.gaps.includes(i) ? ' — ข้ามขั้น/ไม่มีข้อมูล' : '');
+    return `<i class="trk-dot ${cls}" title="${escHtml(tip)}"></i>`;
+  }).join('')}</span>`;
+}
+function trkStageText(p){ return p.complete ? 'เสร็จแล้ว' : ('รอ' + p.steps[p.waitIdx].l); }
+function trkIsVisible(){ return document.getElementById('view-tracking').style.display !== 'none'; }
+/** วาดหน้าติดตามใหม่ตามโหมดที่เปิดอยู่ (Dashboard / รายการ) และหน้าต่างรายการ drill-down ถ้าเปิดอยู่ */
+function trkRerender(){
+  if(trkIsVisible()){
+    if(TRK.mode === 'dash') trkRenderBigDash();
+    else { trkBuildFilters(true); trkRender(); }
+  }
+  if(TRK.drill && document.getElementById('trk-drill-overlay').classList.contains('show')) trkRenderDrill();
+}
+function trkIndex(){
+  TRK.byItem = {};
+  TRK.rows.forEach(r => { if(r.item_id){ (TRK.byItem[r.item_id] = TRK.byItem[r.item_id] || []).push(r); } });
+}
+function trkFind(id){ return TRK.rows.find(r => r.id === id) || null; }
+
+// ─── โหลดข้อมูล ───
+async function trkReload(showToast){
+  try {
+    const { data, error } = await sb.from('asset_tracking').select('*').order('id');
+    if(error) throw error;
+    TRK.rows = data || []; TRK.loaded = true; trkIndex();
+  } catch(e){
+    TRK.loaded = false; trkRenderDash();
+    toast('โหลดข้อมูลติดตามขึ้นทะเบียน/จำหน่ายไม่สำเร็จ: '+e.message,'error');
+    return;
+  }
+  trkRenderDash();
+  trkRerender();
+  trkRefreshItemTable();
+  if(showToast) toast('โหลดข้อมูลติดตามแล้ว','success');
+}
+/** วาดตารางรายการพัสดุใหม่ (ถ้าเปิดอยู่) เพื่อให้ป้าย "จำหน่าย x/6" เป็นปัจจุบัน — ไม่รีเซ็ตหน้า/การค้นหา */
+function trkRefreshItemTable(){
+  if(S.currentCat && document.getElementById('view-table').style.display !== 'none'){
+    renderTableBody(S.currentCat.headers || [], document.getElementById('search-input').value);
+  }
+}
+
+// ─── ป้ายในตารางรายการพัสดุ ───
+function trkItemPills(itemId){
+  if(!TRK.loaded || !TRK.byItem[itemId]) return '';
+  return TRK.byItem[itemId].map(r => {
+    const p = trkProgress(r);
+    if(p.complete) return '';
+    return `<span class="trk-pill" onclick="trkOpenView(${r.id})" title="${escHtml(trkStageText(p))}${p.days!==null?' (ค้าง '+p.days+' วัน)':''}">${TRK_KIND_LABEL[r.kind]} ${p.last+1}/${p.steps.length}</span>`;
+  }).join('');
+}
+
+// ─── การ์ดสรุปบน Dashboard ───
+function trkSummary(kind){
+  const s = { all:0, open:0, done:0, old:0 };
+  TRK.rows.filter(r => r.kind === kind).forEach(r => {
+    const p = trkProgress(r); s.all++;
+    if(p.complete) s.done++; else { s.open++; if(p.days !== null && p.days > TRK_AGE_BAD) s.old++; }
+  });
+  return s;
+}
+function trkRenderDash(){
+  const el = document.getElementById('trk-dash-body'); if(!el) return;
+  if(!TRK.loaded){ el.innerHTML = `<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:12px 0">ยังโหลดข้อมูลไม่ได้ — กดรีเฟรช</div>`; return; }
+  el.innerHTML = ['dispose','register'].map(kind => {
+    const s = trkSummary(kind);
+    const box = (label, v, stage, color) => `<div class="trk-stage" onclick="trkShow('${kind}','${stage}')"><div class="l">${label}</div><div class="v" style="color:${color}">${v}</div></div>`;
+    return `<div style="font-size:12px;font-weight:700;color:var(--text);margin:4px 0 6px"><i class="fas ${kind==='dispose'?'fa-box-archive':'fa-file-signature'}" style="color:var(--text-muted)"></i> ${TRK_KIND_LABEL[kind]}</div>
+      <div class="trk-stage-row" style="margin-bottom:10px">
+        ${box('ทั้งหมด', s.all, '', 'var(--primary)')}
+        ${box('กำลังดำเนินการ', s.open, 'open', '#d97706')}
+        ${box('ค้างเกิน '+TRK_AGE_BAD+' วัน', s.old, 'old', 'var(--danger)')}
+        ${box('เสร็จแล้ว', s.done, 'done', 'var(--success)')}
+      </div>`;
+  }).join('') + `<div style="text-align:right"><button class="btn btn-outline btn-sm" onclick="trkShow('dash')"><i class="fas fa-chart-column"></i> เปิด Dashboard ขึ้นทะเบียน/จำหน่าย</button></div>`;
+}
+
+// ─── หน้าติดตาม ───
+function trkShow(kind, stage){
+  const isDash = kind === 'dash';
+  TRK.mode = isDash ? 'dash' : 'list';
+  if(!isDash) TRK.kind = kind === 'register' ? 'register' : 'dispose';
+  TRK.page = 1;
+  S.currentCat = null;
+  document.getElementById('view-dashboard').style.display = 'none';
+  document.getElementById('view-table').style.display = 'none';
+  document.getElementById('view-tracking').style.display = '';
+  document.getElementById('trk-dash-view').style.display = isDash ? '' : 'none';
+  document.getElementById('trk-list-view').style.display = isDash ? 'none' : '';
+  document.getElementById('trk-btn-new').style.display = isDash ? 'none' : '';
+  document.getElementById('trk-tab-dash').classList.toggle('active', isDash);
+  document.getElementById('trk-tab-dispose').classList.toggle('active', !isDash && TRK.kind === 'dispose');
+  document.getElementById('trk-tab-register').classList.toggle('active', !isDash && TRK.kind === 'register');
+  if(isDash){
+    document.getElementById('page-title').textContent = 'Dashboard ขึ้นทะเบียน / จำหน่ายครุภัณฑ์';
+    document.getElementById('page-subtitle').textContent = 'ภาพรวมงานขึ้นทะเบียนและจำหน่าย — คลิกการ์ดหรือกราฟเพื่อดูรายการ';
+    setActiveNav('nav-trk-dash');
+    if(!TRK.loaded) trkReload(false);
+    trkRenderBigDash();
+    return;
+  }
+  document.getElementById('page-title').textContent = 'ติดตาม' + TRK_KIND_LABEL[TRK.kind] + 'ครุภัณฑ์';
+  document.getElementById('page-subtitle').textContent = TRK_STEPS[TRK.kind].map(s => s.l).join(' → ');
+  setActiveNav('nav-trk-' + TRK.kind);
+  document.getElementById('trk-search').value = '';
+  document.getElementById('trk-f-line').value = '';
+  document.getElementById('trk-f-link').value = '';
+  trkBuildFilters(false);
+  document.getElementById('trk-f-stage').value = stage || '';
+  if(!TRK.loaded) trkReload(false);
+  trkRender();
+}
+function trkBuildFilters(keep){
+  const stSel = document.getElementById('trk-f-stage'), fySel = document.getElementById('trk-f-fy');
+  const prevSt = stSel.value, prevFy = fySel.value;
+  const steps = TRK_STEPS[TRK.kind];
+  stSel.innerHTML = `<option value="">-- ทุกขั้นตอน --</option><option value="open">กำลังดำเนินการ</option><option value="old">ค้างเกิน ${TRK_AGE_BAD} วัน</option><option value="done">เสร็จแล้ว</option>`
+    + steps.map((s,i)=>`<option value="w${i}">รอ${escHtml(s.l)}</option>`).join('')
+    + `<option value="gap">มีขั้นที่ข้าม/ไม่มีข้อมูล</option>`;
+  const fys = new Set();
+  TRK.rows.filter(r => r.kind === TRK.kind).forEach(r => { const p = trkProgress(r); if(p.fy) fys.add(p.fy); });
+  fySel.innerHTML = `<option value="">-- ทุกปีงบฯ (ที่เสร็จ) --</option>` + [...fys].sort((a,b)=>b-a).map(y=>`<option value="${y}">ปีงบฯ ${y}</option>`).join('');
+  if(keep){ stSel.value = prevSt; fySel.value = [...fys].map(String).includes(prevFy) ? prevFy : ''; }
+}
+function trkApply(){ TRK.page = 1; trkRender(); }
+function trkSetStage(v){ document.getElementById('trk-f-stage').value = v; trkApply(); }
+
+function trkFilterRows(){
+  const q = document.getElementById('trk-search').value.trim().toLowerCase();
+  const line = document.getElementById('trk-f-line').value;
+  const stage = document.getElementById('trk-f-stage').value;
+  const fy = document.getElementById('trk-f-fy').value;
+  const link = document.getElementById('trk-f-link').value;
+  const out = [];
+  TRK.rows.forEach(r => {
+    if(r.kind !== TRK.kind) return;
+    if(line && r.line !== line) return;
+    if(link === 'linked' && !r.item_id) return;
+    if(link === 'unlinked' && r.item_id) return;
+    const p = trkProgress(r);
+    if(stage === 'open' && p.complete) return;
+    if(stage === 'done' && !p.complete) return;
+    if(stage === 'old' && !(p.days !== null && p.days > TRK_AGE_BAD)) return;
+    if(stage === 'gap' && !p.gaps.length) return;
+    if(/^w\d+$/.test(stage) && p.waitIdx !== +stage.slice(1)) return;
+    if(fy && String(p.fy) !== fy) return;
+    if(q){
+      const hay = TRK_TEXT_FIELDS.map(f => r[f]||'').concat(Object.values(r.step_text||{})).join(' ').toLowerCase();
+      if(!hay.includes(q)) return;
+    }
+    out.push({ r, p });
+  });
+  out.sort(trkSortCmp);
+  return out;
+}
+/** เรื่องที่ค้างอยู่ก่อน (ค้างนานสุดก่อน) แล้วตามด้วยเรื่องที่เสร็จ (เสร็จล่าสุดก่อน) */
+function trkSortCmp(a, b){
+  if(a.p.complete !== b.p.complete) return a.p.complete ? 1 : -1;
+  if(!a.p.complete) return (b.p.days ?? -1) - (a.p.days ?? -1) || a.r.id - b.r.id;
+  return String(b.p.endDate||'').localeCompare(String(a.p.endDate||'')) || a.r.id - b.r.id;
+}
+function trkStatusHtml(p){
+  return p.complete
+    ? `<span class="status-badge st-good">เสร็จ ${escHtml(trkFmtDate(p.endDate))}</span>${p.fy?` <span class="trk-sub">ปีงบฯ ${p.fy}</span>`:''}`
+    : `<span class="status-badge st-wait">${escHtml(trkStageText(p))}</span>${p.gaps.length?' <i class="fas fa-circle-exclamation" style="color:var(--danger)" title="มีขั้นก่อนหน้าที่ไม่มีข้อมูล"></i>':''}`;
+}
+
+function trkRender(){
+  const kind = TRK.kind, steps = TRK_STEPS[kind];
+  const statGrid = document.getElementById('trk-stat-grid');
+  if(!TRK.loaded){
+    statGrid.innerHTML = '';
+    document.getElementById('trk-stage-row').innerHTML = '';
+    document.getElementById('trk-tbody').innerHTML = `<tr><td colspan="99" style="text-align:center;padding:40px;color:var(--text-muted)">กำลังโหลด...</td></tr>`;
+    return;
+  }
+  const s = trkSummary(kind);
+  const card = (icon, color, label, v, sub, stage) => `<div class="stat-card" onclick="trkSetStage('${stage}')">
+      <div class="stat-icon ${color}"><i class="fas ${icon}"></i></div>
+      <div class="stat-info"><div class="stat-label">${label}</div><div class="stat-value">${v}</div><div class="stat-sub">${sub}</div></div></div>`;
+  statGrid.innerHTML =
+    card('fa-folder-open','blue','เรื่อง'+TRK_KIND_LABEL[kind]+'ทั้งหมด', s.all, 'คลิกเพื่อดูทั้งหมด', '') +
+    card('fa-hourglass-half','orange','กำลังดำเนินการ', s.open, 'ยังไม่ถึงขั้นสุดท้าย', 'open') +
+    card('fa-triangle-exclamation','purple','ค้างเกิน '+TRK_AGE_BAD+' วัน', s.old, 'นับจากวันที่ล่าสุดที่บันทึก', 'old') +
+    card('fa-circle-check','green','เสร็จแล้ว', s.done, steps[steps.length-1].l+'แล้ว', 'done');
+
+  const cur = document.getElementById('trk-f-stage').value;
+  const counts = steps.map(()=>0);
+  TRK.rows.forEach(r => { if(r.kind !== kind) return; const p = trkProgress(r); if(!p.complete) counts[p.waitIdx]++; });
+  document.getElementById('trk-stage-row').innerHTML = steps.map((st,i)=>
+    `<div class="trk-stage ${cur==='w'+i?'active':''}" onclick="trkSetStage('${cur==='w'+i?'':'w'+i}')" title="คลิกเพื่อกรอง/ยกเลิกกรอง"><div class="l">${i+1}. รอ${escHtml(st.l)}</div><div class="v">${counts[i]}</div></div>`).join('');
+
+  TRK.filtered = trkFilterRows();
+  const total = TRK.filtered.length, pages = Math.max(1, Math.ceil(total / TRK.ps));
+  if(TRK.page > pages) TRK.page = pages;
+  const start = (TRK.page - 1) * TRK.ps, pageRows = TRK.filtered.slice(start, start + TRK.ps);
+
+  document.getElementById('trk-table-title').textContent = 'รายการเรื่อง' + TRK_KIND_LABEL[kind];
+  document.getElementById('trk-thead').innerHTML = `<tr>
+    <th style="width:44px;min-width:44px">#</th><th>เครื่อง / ทะเบียนครุภัณฑ์</th><th>S/N · INH · NVH</th>
+    <th>ขั้นตอน</th><th>สถานะ</th><th>ค้าง</th><th>รายการพัสดุ</th><th style="width:124px;min-width:124px">จัดการ</th></tr>`;
+  document.getElementById('trk-tbody').innerHTML = pageRows.length ? pageRows.map(({r,p},i)=>{
+    const ids = [r.sn && 'S/N '+r.sn, r.inh_no && 'INH '+r.inh_no, r.nvh_no && 'NVH '+r.nvh_no].filter(Boolean).join(' · ');
+    const status = trkStatusHtml(p);
+    const cat = r.category_id ? S.categories.find(c => c.id === r.category_id) : null;
+    const itemCell = r.item_id
+      ? `<span class="trk-link" onclick="trkGoItem(${r.id})" title="เปิดในรายการพัสดุ">#${r.item_id}</span> <span class="trk-sub">${escHtml(cat ? cat.name : '')}</span>`
+      : `<span class="trk-sub">ไม่มีในรายการพัสดุ</span>`;
+    return `<tr>
+      <td style="color:var(--text-muted);font-size:11px;font-weight:600;background:var(--thead-bg)">${start+i+1}</td>
+      <td style="max-width:260px"><span class="trk-link" onclick="trkOpenView(${r.id})" title="${escHtml(r.item_name)}">${escHtml(r.item_name)}</span><div class="trk-sub">${escHtml(r.asset_reg_no || '—')} · ${escHtml(TRK_LINE_LABEL[r.line] || r.line)}</div></td>
+      <td style="max-width:190px" title="${escHtml(ids)}"><span class="trk-sub">${escHtml(ids || '—')}</span></td>
+      <td>${trkDotsHtml(p)} <span class="trk-sub">${p.last+1}/${p.steps.length}</span></td>
+      <td>${status}</td>
+      <td>${trkAgeHtml(p)}</td>
+      <td style="max-width:170px">${itemCell}</td>
+      <td><div class="td-actions">
+        <button class="btn btn-ghost btn-sm btn-icon" onclick="trkOpenView(${r.id})" title="ดูรายละเอียด"><i class="fas fa-eye"></i></button>
+        <button class="btn btn-outline btn-sm btn-icon" onclick="trkEdit(${r.id})" title="แก้ไข / บันทึกวันที่"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="trkAskDelete(${r.id})" title="ลบเรื่อง"><i class="fas fa-trash"></i></button>
+      </div></td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="99" style="text-align:center;padding:52px;color:var(--text-muted)"><i class="fas fa-inbox" style="font-size:36px;display:block;margin-bottom:12px;opacity:.35"></i>ไม่พบเรื่องตามเงื่อนไข</td></tr>`;
+
+  document.getElementById('trk-count').textContent = total ? `${start+1}–${Math.min(start+TRK.ps,total)} จาก ${total} เรื่อง` : '0 เรื่อง';
+  document.getElementById('trk-page-info').textContent = `หน้า ${TRK.page}/${pages} (${total} เรื่อง)`;
+  const cp = TRK.page;
+  const range = pages<=7 ? [...Array(pages)].map((_,i)=>i+1) : cp<=4 ? [1,2,3,4,5,'…',pages] : cp>=pages-3 ? [1,'…',pages-4,pages-3,pages-2,pages-1,pages] : [1,'…',cp-1,cp,cp+1,'…',pages];
+  document.getElementById('trk-page-btns').innerHTML =
+    `<div class="page-btn ${cp<=1?'dis':''}" onclick="trkGoPage(${cp-1})"><i class="fas fa-chevron-left"></i></div>` +
+    range.map(pg => pg==='…' ? `<div class="page-btn" style="cursor:default;border:none">…</div>` : `<div class="page-btn ${pg===cp?'active':''}" onclick="trkGoPage(${pg})">${pg}</div>`).join('') +
+    `<div class="page-btn ${cp>=pages?'dis':''}" onclick="trkGoPage(${cp+1})"><i class="fas fa-chevron-right"></i></div>`;
+}
+function trkGoPage(p){ const pages = Math.max(1, Math.ceil(TRK.filtered.length / TRK.ps)); if(p<1||p>pages) return; TRK.page = p; trkRender(); }
+
+// ─── ดูรายละเอียด (ไม่ต้องใช้ PIN) ───
+function trkOpenView(id){
+  const r = trkFind(id); if(!r) return;
+  const p = trkProgress(r);
+  document.getElementById('trk-modal-title').innerHTML = `<i class="fas ${r.kind==='dispose'?'fa-box-archive':'fa-file-signature'}" style="color:#d97706"></i> ${TRK_KIND_LABEL[r.kind]} — ${escHtml(r.item_name)}`;
+  const info = (label, v) => `<div class="form-group"><div class="form-label">${label}</div><div style="font-size:13px">${v || '<span class="trk-sub">—</span>'}</div></div>`;
+  const cat = r.category_id ? S.categories.find(c => c.id === r.category_id) : null;
+  let prevDate = null;
+  const tl = p.steps.map((s,i)=>{
+    const d = r[s.k], t = trkStepText(r, s.k);
+    const cls = p.done[i] ? 'done' : (i === p.waitIdx ? 'wait' : (p.gaps.includes(i) ? 'gap' : ''));
+    const ic = p.done[i] ? '<i class="fas fa-check"></i>' : (i === p.waitIdx ? '<i class="fas fa-clock"></i>' : (i+1));
+    const dd = trkParseDate(d);
+    let gap = '';
+    if(dd && prevDate){ const n = Math.round((dd - prevDate)/86400000); gap = ` <span class="trk-sub">(${n>=0?'+':''}${n} วัน)</span>`; }
+    if(dd) prevDate = dd;
+    let right = d ? escHtml(trkFmtDate(d)) : '';
+    if(t) right += (right ? ' · ' : '') + `<span class="trk-sub">${escHtml(t)}</span>`;
+    if(i === p.waitIdx) right = `<span style="color:#b45309;font-weight:600">กำลังรอ${p.days!==null?' — '+p.days+' วัน':''}</span>` + (right ? ' · ' + right : '');
+    else if(!right) right = p.gaps.includes(i) ? '<span style="color:var(--danger)">ไม่มีข้อมูล</span>' : '<span class="trk-sub">—</span>';
+    return `<div class="trk-tl-row"><div class="trk-tl-ic ${cls}">${ic}</div><div class="trk-tl-main"><span style="font-weight:600">${i+1}. ${escHtml(s.l)}${gap}</span><span>${right}</span></div></div>`;
+  }).join('');
+  document.getElementById('trk-modal-body').innerHTML = `
+    <div class="form-grid">
+      ${info('ชื่อเครื่อง / พัสดุ', escHtml(r.item_name))}
+      ${info('สาย', escHtml(TRK_LINE_LABEL[r.line]||r.line))}
+      ${info('หมายเลขทะเบียนครุภัณฑ์', escHtml(r.asset_reg_no))}
+      ${info('S/N', escHtml(r.sn))}
+      ${info('INH No.', escHtml(r.inh_no))}
+      ${info('NVH No.', escHtml(r.nvh_no))}
+      ${r.kind==='register' ? info('การได้มา', escHtml(r.acquisition_method)) : ''}
+      ${info('รายการพัสดุ', r.item_id ? `<span class="trk-link" onclick="trkGoItem(${r.id})">#${r.item_id}</span> <span class="trk-sub">${escHtml(cat?cat.name:'')}</span> <span id="trk-view-item-status" class="trk-sub"></span>` : '<span class="trk-sub">ไม่มีในรายการพัสดุ</span>')}
+      ${r.spec ? `<div class="form-group full"><div class="form-label">คุณลักษณะ/คุณสมบัติ</div><div style="font-size:13px">${escHtml(r.spec)}</div></div>` : ''}
+    </div>
+    <div class="trk-section-title"><i class="fas fa-route"></i> ขั้นตอน — ${escHtml(trkStageText(p))} ${trkAgeHtml(p)}${p.fy?` <span class="trk-sub">ปีงบฯ ${p.fy}</span>`:''}</div>
+    <div class="trk-tl">${tl}</div>
+    ${p.gaps.length ? `<div class="trk-info" style="margin-top:10px;border-color:#fca5a5"><i class="fas fa-circle-exclamation" style="color:var(--danger)"></i> มีขั้นก่อนหน้าที่ไม่มีข้อมูล: ${p.gaps.map(i=>escHtml(p.steps[i].l)).join(', ')}</div>` : ''}
+    ${r.note ? `<div class="trk-section-title"><i class="fas fa-note-sticky"></i> หมายเหตุ</div><div style="font-size:13px;white-space:pre-wrap">${escHtml(r.note)}</div>` : ''}`;
+  document.getElementById('trk-modal-footer').innerHTML = `
+    <button class="btn btn-danger btn-sm" onclick="trkAskDelete(${r.id})" style="margin-right:auto"><i class="fas fa-trash"></i> ลบเรื่อง</button>
+    <button class="btn btn-ghost" onclick="trkCloseModal()">ปิด</button>
+    <button class="btn btn-primary" onclick="trkEdit(${r.id})"><i class="fas fa-edit"></i> แก้ไข / บันทึกวันที่</button>`;
+  document.getElementById('trk-overlay').classList.add('show');
+  if(r.item_id) trkLoadItemStatus(r.item_id);
+}
+async function trkLoadItemStatus(itemId){
+  try {
+    const { data } = await sb.from('items').select('id,status').eq('id', itemId).maybeSingle();
+    const el = document.getElementById('trk-view-item-status');
+    if(el) el.textContent = data ? '— สถานะ: ' + (data.status || 'ไม่ระบุ') : '— (ไม่พบในรายการพัสดุแล้ว)';
+  } catch(e){ /* แสดงผลเสริมเท่านั้น ไม่ต้องแจ้ง error */ }
+}
+function trkCloseModal(){ document.getElementById('trk-overlay').classList.remove('show'); TRK.editRow = null; TRK.editBase = null; }
+
+// ─── แก้ไข / เพิ่มเรื่อง (ต้องใช้ PIN เหมือนระบบเดิม) ───
+function trkEdit(id){
+  const r = trkFind(id); if(!r) return;
+  requirePin('แก้ไขเรื่อง' + TRK_KIND_LABEL[r.kind], () => trkRenderEdit(r));
+}
+function trkOpenNew(){
+  const kind = TRK.kind;
+  requirePin('เพิ่มเรื่อง' + TRK_KIND_LABEL[kind] + 'ใหม่', () => trkRenderEdit(null, { kind, line:'med' }));
+}
+function trkRenderEdit(row, base){
+  const r = row || Object.assign({ id:null, item_id:null, category_id:null, step_text:{} }, base || {});
+  TRK.editRow = row; TRK.editBase = r;
+  const steps = TRK_STEPS[r.kind];
+  const cat = r.category_id ? S.categories.find(c => c.id === r.category_id) : null;
+  const inp = (id, label, v, full, req) => `<div class="form-group ${full?'full':''}"><label class="form-label">${label}${req?' <span style="color:var(--danger)">*</span>':''}</label><input type="text" class="plain-input" id="trk-e-${id}" value="${escHtml(v||'')}"></div>`;
+  document.getElementById('trk-modal-title').innerHTML = `<i class="fas ${row?'fa-edit':'fa-plus-circle'}" style="color:${row?'var(--primary)':'var(--success)'}"></i> ${row?'แก้ไข':'เพิ่ม'}เรื่อง${TRK_KIND_LABEL[r.kind]}`;
+  document.getElementById('trk-modal-body').innerHTML = `
+    ${r.item_id ? `<div class="trk-info"><i class="fas fa-link"></i> เชื่อมกับรายการพัสดุ <b>#${r.item_id}</b> ${escHtml(cat?'('+cat.name+')':'')} — เมื่อบันทึก ระบบจะเสนอให้อัปเดตสถานะในรายการพัสดุ (ต้องกดยืนยันก่อนเสมอ)</div>`
+      : `<div class="trk-info"><i class="fas fa-circle-info"></i> เรื่องนี้ไม่ได้เชื่อมกับรายการพัสดุ — ถ้าเครื่องยังอยู่ในรายการพัสดุ แนะนำให้เริ่มเรื่องจากปุ่ม <i class="fas fa-route"></i> ที่แถวของเครื่องในตาราง เพื่อดึงข้อมูลเครื่องและเชื่อมสถานะอัตโนมัติ</div>`}
+    <div class="form-grid">
+      ${inp('item_name','ชื่อเครื่อง / พัสดุ', r.item_name, true, true)}
+      ${inp('spec','คุณลักษณะ/คุณสมบัติ', r.spec, true)}
+      ${inp('asset_reg_no','หมายเลขทะเบียนครุภัณฑ์', r.asset_reg_no)}
+      ${inp('sn','S/N', r.sn)}
+      ${inp('inh_no','INH No.', r.inh_no)}
+      ${inp('nvh_no','NVH No.', r.nvh_no)}
+      <div class="form-group"><label class="form-label">สาย</label>
+        <select class="plain-input" id="trk-e-line"><option value="med" ${r.line!=='other'?'selected':''}>สายแพทย์</option><option value="other" ${r.line==='other'?'selected':''}>สายอื่นๆ</option></select></div>
+      ${r.kind==='register' ? inp('acquisition_method','การได้มา', r.acquisition_method) : ''}
+    </div>
+    <div class="trk-section-title"><i class="fas fa-route"></i> ขั้นตอน — ใส่วันที่เมื่อขั้นนั้นเสร็จ (ใส่ย้อนหลังได้) · ช่องข้อความใช้เมื่อไม่มีวันที่ เช่น "ได้ DTO แล้ว", "รับโอน"</div>
+    <div class="trk-tl">${steps.map((s,i)=>`
+      <div class="trk-tl-row"><div class="trk-tl-ic">${i+1}</div><div>
+        <div style="font-weight:600;font-size:13px">${escHtml(s.l)}</div>
+        <div class="trk-tl-edit">
+          <input type="date" class="plain-input" id="trk-d-${s.k}" value="${escHtml(r[s.k]||'')}">
+          <input type="text" class="plain-input" id="trk-t-${s.k}" value="${escHtml(trkStepText(r,s.k))}" placeholder="ข้อความ (ถ้าไม่มีวันที่) — ขึ้นต้นด้วย &quot;รอ&quot; = ยังไม่เสร็จ">
+        </div></div></div>`).join('')}
+    </div>
+    <div class="form-group full" style="margin-top:12px"><label class="form-label">หมายเหตุ</label>
+      <textarea class="plain-input" id="trk-e-note" rows="3" style="resize:vertical">${escHtml(r.note||'')}</textarea></div>
+    <div id="trk-e-error" style="color:var(--danger);font-size:12px;font-weight:600;min-height:16px;margin-top:8px"></div>`;
+  document.getElementById('trk-modal-footer').innerHTML = `
+    <button class="btn btn-ghost" onclick="${row?`trkOpenView(${row.id})`:'trkCloseModal()'}">ยกเลิก</button>
+    <button class="btn btn-primary" onclick="trkSave()" id="trk-save-btn"><i class="fas fa-save"></i> บันทึก</button>`;
+  document.getElementById('trk-overlay').classList.add('show');
+  setTimeout(()=>{ const el = document.getElementById('trk-e-item_name'); if(el && !el.value) el.focus(); }, 150);
+}
+
+async function trkSave(){
+  const base = TRK.editBase; if(!base) return;
+  const val = id => (document.getElementById(id) || {}).value || '';
+  const errEl = document.getElementById('trk-e-error');
+  const payload = {
+    kind: base.kind, line: val('trk-e-line') || 'med',
+    item_id: base.item_id || null, category_id: base.category_id || null,
+    item_name: val('trk-e-item_name').trim(), spec: val('trk-e-spec').trim(),
+    asset_reg_no: val('trk-e-asset_reg_no').trim(), sn: val('trk-e-sn').trim(),
+    inh_no: val('trk-e-inh_no').trim(), nvh_no: val('trk-e-nvh_no').trim(),
+    acquisition_method: base.kind === 'register' ? val('trk-e-acquisition_method').trim() : (base.acquisition_method || ''),
+    note: val('trk-e-note').trim(), step_text: {}
+  };
+  if(!payload.item_name){ errEl.textContent = 'กรุณากรอกชื่อเครื่อง / พัสดุ'; document.getElementById('trk-e-item_name').focus(); return; }
+  for(const s of TRK_STEPS[base.kind]){
+    const d = val('trk-d-'+s.k).trim(), t = val('trk-t-'+s.k).trim();
+    if(d && !trkParseDate(d)){ errEl.textContent = 'รูปแบบวันที่ไม่ถูกต้อง: ' + s.l; return; }
+    payload[s.k] = d || null;
+    if(t) payload.step_text[s.k] = t;
+  }
+  errEl.textContent = '';
+  const btn = document.getElementById('trk-save-btn'); if(btn){ btn.disabled = true; btn.style.opacity = '.6'; }
+  showLoading(true);
+  try {
+    const { data, error } = await sb.rpc('rpc_upsert_tracking', { p_id: TRK.editRow ? TRK.editRow.id : null, p_payload: payload, p_pin: PIN_CORRECT });
+    if(error) throw error;
+    const saved = data;
+    const idx = TRK.rows.findIndex(x => x.id === saved.id);
+    if(idx >= 0) TRK.rows[idx] = saved; else TRK.rows.push(saved);
+    trkIndex();
+    toast(TRK.editRow ? 'บันทึกเรื่องสำเร็จ' : 'เพิ่มเรื่องใหม่สำเร็จ', 'success');
+    trkRenderDash();
+    trkRerender();
+    trkRefreshItemTable();
+    trkOpenView(saved.id);
+    trkMaybeSync(saved);
+  } catch(e){
+    errEl.textContent = 'บันทึกไม่สำเร็จ: ' + e.message;
+  } finally {
+    showLoading(false);
+    if(btn){ btn.disabled = false; btn.style.opacity = '1'; }
+  }
+}
+
+// ─── เสนออัปเดตสถานะในรายการพัสดุ (ทำเฉพาะเมื่อผู้ใช้กดยืนยัน) ───
+function trkStatusGroup(s){
+  s = String(s||'').trim();
+  if(s === 'จำหน่าย' || s === 'จำหน่ายแล้ว' || s === 'ในระบบจำหน่ายแล้ว') return 'done';
+  if(s.includes('จำหน่าย')) return 'wait';
+  if(s.includes('ชำรุด')) return 'broken';
+  return s;
+}
+async function trkMaybeSync(r){
+  if(!r || !r.item_id) return;
+  const p = trkProgress(r);
+  let target = null, regNo = null;
+  if(r.kind === 'dispose'){
+    if(p.complete) target = 'จำหน่าย';
+    else if(p.last >= 1) target = 'ระหว่างทำเรื่องจำหน่าย';
+    else if(p.last === 0) target = 'ชำรุด';
+  } else if(r.kind === 'register' && p.complete){
+    target = 'ใช้ราชการได้'; regNo = (r.asset_reg_no || '').trim();
+  }
+  if(!target) return;
+  let item;
+  try {
+    const { data, error } = await sb.from('items').select('id,status,category_id,data').eq('id', r.item_id).maybeSingle();
+    if(error || !data) return;
+    item = data;
+  } catch(e){ return; }
+  const cur = normalizeStatus(item.status || '');
+  const curG = trkStatusGroup(cur), tgtG = trkStatusGroup(target);
+  const cat = S.categories.find(c => c.id === item.category_id);
+  const hasRegCol = !!(cat && (cat.headers||[]).some(h => normH(h) === 'หมายเลขทะเบียนครุภัณฑ์'));
+  const curReg = String((item.data||{})['หมายเลขทะเบียนครุภัณฑ์'] || '').trim();
+  const regChange = !!(regNo && hasRegCol && regNo !== curReg);
+  let statusChange = cur !== target;
+  if(r.kind === 'dispose'){
+    if(curG === 'done') statusChange = false;                                   // จำหน่ายแล้ว ไม่ย้อนสถานะ
+    else if(tgtG === 'wait' && curG === 'wait') statusChange = false;           // อยู่ระหว่างจำหน่ายอยู่แล้ว (เช่น รอใบ decom)
+    else if(tgtG === 'broken' && (curG === 'broken' || curG === 'wait')) statusChange = false;
+  }
+  if(!statusChange && !regChange) return;
+  const lines = [];
+  if(statusChange) lines.push(`<div style="margin-bottom:6px"><b>สถานะ:</b> <span class="status-badge ${getStCls(cur)}">${escHtml(cur || 'ไม่ระบุ')}</span> <i class="fas fa-arrow-right" style="font-size:11px;color:var(--text-muted)"></i> <span class="status-badge ${getStCls(target)}">${escHtml(target)}</span></div>`);
+  if(regChange) lines.push(`<div><b>หมายเลขทะเบียนครุภัณฑ์:</b> ${escHtml(curReg || '(ว่าง)')} <i class="fas fa-arrow-right" style="font-size:11px;color:var(--text-muted)"></i> ${escHtml(regNo)}</div>`);
+  trkConfirm('<i class="fas fa-rotate" style="color:var(--primary)"></i> อัปเดตรายการพัสดุด้วยไหม?',
+    `<p style="font-size:13px;color:var(--text-muted);margin-bottom:12px">รายการพัสดุ <b>#${item.id}</b> ${escHtml(cat?'('+cat.name+')':'')} — ขั้นล่าสุด: ${escHtml(trkStageText(p))}</p>
+     <div style="padding:12px;background:var(--bg);border-radius:8px;font-size:13px;border-left:3px solid var(--primary)">${lines.join('')}</div>
+     <p style="font-size:11px;color:var(--text-muted);margin-top:10px">แก้เฉพาะช่องที่แสดงด้านบน ข้อมูลอื่นของเครื่องไม่เปลี่ยน</p>`,
+    'อัปเดตรายการพัสดุ', 'ไม่เปลี่ยน',
+    async () => {
+      showLoading(true);
+      try {
+        const { error } = await sb.rpc('rpc_sync_item_status', { p_item_id: item.id, p_status: statusChange ? target : cur, p_reg_no: regChange ? regNo : null, p_pin: PIN_CORRECT });
+        if(error) throw error;
+        delete S.allItems[item.category_id]; S.dashStats = null; S.dashExtra = null;
+        if(S.currentCat && S.currentCat.id === item.category_id && document.getElementById('view-table').style.display !== 'none') await loadCategoryItems(S.currentCat);
+        toast('อัปเดตรายการพัสดุ #' + item.id + ' แล้ว', 'success');
+        trkLoadItemStatus(item.id);
+      } catch(e){ toast('อัปเดตรายการพัสดุไม่สำเร็จ: ' + e.message, 'error'); }
+      finally { showLoading(false); }
+    });
+}
+
+// ─── ลบเรื่อง ───
+function trkAskDelete(id){
+  const r = trkFind(id); if(!r) return;
+  requirePin('ลบเรื่อง' + TRK_KIND_LABEL[r.kind], () => {
+    trkConfirm('<span style="color:var(--danger)"><i class="fas fa-trash-alt"></i> ยืนยันการลบเรื่อง</span>',
+      `<p style="color:var(--text-muted);margin-bottom:12px">ลบเฉพาะเรื่องติดตามนี้ — รายการพัสดุไม่ถูกลบ · ไม่สามารถย้อนกลับได้</p>
+       <div style="padding:12px;background:var(--bg);border-radius:8px;font-size:13px;border-left:3px solid var(--danger)"><b>${escHtml(TRK_KIND_LABEL[r.kind])}:</b> ${escHtml(r.item_name)}<br><span class="trk-sub">${escHtml(r.asset_reg_no||'')}</span></div>`,
+      'ลบ', 'ยกเลิก',
+      async () => {
+        showLoading(true);
+        try {
+          const { error } = await sb.rpc('rpc_delete_tracking', { p_id: id, p_pin: PIN_CORRECT });
+          if(error) throw error;
+          TRK.rows = TRK.rows.filter(x => x.id !== id); trkIndex();
+          trkCloseModal(); toast('ลบเรื่องสำเร็จ', 'success');
+          trkRenderDash(); trkRerender(); trkRefreshItemTable();
+        } catch(e){ toast('ลบไม่สำเร็จ: ' + e.message, 'error'); }
+        finally { showLoading(false); }
+      }, true);
+  });
+}
+
+// ─── หน้าต่างยืนยัน (ใช้ร่วมกันใน TRK) ───
+function trkConfirm(title, bodyHtml, yesLabel, noLabel, fn, danger){
+  TRK.confirmFn = fn;
+  document.getElementById('trk-confirm-title').innerHTML = title;
+  document.getElementById('trk-confirm-body').innerHTML = bodyHtml;
+  const y = document.getElementById('trk-confirm-yes');
+  y.textContent = yesLabel; y.className = 'btn ' + (danger ? 'btn-danger' : 'btn-primary');
+  document.getElementById('trk-confirm-no').textContent = noLabel;
+  document.getElementById('trk-confirm-overlay').classList.add('show');
+}
+function trkConfirmClose(){ document.getElementById('trk-confirm-overlay').classList.remove('show'); TRK.confirmFn = null; }
+function trkConfirmYes(){ const fn = TRK.confirmFn; trkConfirmClose(); if(fn) fn(); }
+
+// ─── เริ่มจากแถวในตารางรายการพัสดุ ───
+function trkPrefillFromItem(item, cat){
+  const h = cat.headers || [], d = item.data || {};
+  const get = pred => { const k = h.find(x => pred(normH(x))); return k ? trkClean(d[k]) : ''; };
+  const brandModel = [get(n => n === 'ยี่ห้อ'), get(n => n === 'รุ่น')].filter(Boolean).join(' ');
+  let received = '';
+  const dk = h.find(isAcquireDateCol);
+  if(dk){ const dt = parseFlexibleDate(String(d[dk] || '').trim()); if(dt) received = trkYmd(dt); }
+  return {
+    item_id: item.id, category_id: cat.id,
+    line: String(cat.name || '').includes('สายอื่น') ? 'other' : 'med',
+    item_name: get(n => n === 'รายการสินทรัพย์ (ครุภัณฑ์)') || String(cat.name || '').trim(),
+    spec: get(n => n.startsWith('รายการลักษณะ')) || brandModel,
+    asset_reg_no: get(n => n === 'หมายเลขทะเบียนครุภัณฑ์'),
+    sn: get(n => /^(sn|s\/n)/i.test(n)),
+    inh_no: get(n => /inh/i.test(n)),
+    nvh_no: get(n => /nvh/i.test(n)),
+    acquisition_method: get(n => n === 'ชื่องบประมาณ') || get(n => n === 'จาก งป.'),
+    received_date: received
+  };
+}
+function trkOpenPick(itemId){
+  const cat = S.currentCat; if(!cat) return;
+  const item = (S.allItems[cat.id] || []).find(it => it.id === itemId); if(!item) return;
+  const pre = trkPrefillFromItem(item, cat);
+  const mine = TRK.byItem[itemId] || [];
+  document.getElementById('trk-pick-body').innerHTML = `
+    <div class="trk-info"><b>#${item.id}</b> ${escHtml(pre.item_name)} · ${escHtml(pre.asset_reg_no || pre.sn || '')} <br>สถานะปัจจุบัน: ${escHtml(normalizeStatus(item.status || '') || 'ไม่ระบุ')}</div>
+    ${!TRK.loaded ? '<div class="trk-info" style="border-color:#fcd34d">ยังโหลดข้อมูลติดตามไม่ได้ — กดรีเฟรชแล้วลองใหม่</div>' : ['dispose','register'].map(kind => {
+      const r = mine.find(x => x.kind === kind);
+      if(r){ const p = trkProgress(r);
+        return `<div class="trk-choice"><i class="fas ${kind==='dispose'?'fa-box-archive':'fa-file-signature'}" style="font-size:18px;color:var(--text-muted)"></i>
+          <div class="t"><div style="font-weight:700">เรื่อง${TRK_KIND_LABEL[kind]}</div><div class="trk-sub">${trkDotsHtml(p)} ${escHtml(trkStageText(p))}${p.days!==null?' · ค้าง '+p.days+' วัน':''}</div></div>
+          <button class="btn btn-outline btn-sm" onclick="trkClosePick();trkOpenView(${r.id})"><i class="fas fa-eye"></i> ดูเรื่อง</button></div>`; }
+      return `<div class="trk-choice"><i class="fas ${kind==='dispose'?'fa-box-archive':'fa-file-signature'}" style="font-size:18px;color:var(--text-muted)"></i>
+        <div class="t"><div style="font-weight:700">เรื่อง${TRK_KIND_LABEL[kind]}</div><div class="trk-sub">ยังไม่มีเรื่อง</div></div>
+        <button class="btn ${kind==='dispose'?'btn-danger':'btn-success'} btn-sm" onclick="trkStartFromItem(${item.id},'${kind}')"><i class="fas fa-plus"></i> เริ่มเรื่อง${TRK_KIND_LABEL[kind]}</button></div>`;
+    }).join('')}`;
+  document.getElementById('trk-pick-overlay').classList.add('show');
+}
+function trkClosePick(){ document.getElementById('trk-pick-overlay').classList.remove('show'); }
+function trkStartFromItem(itemId, kind){
+  const cat = S.currentCat; if(!cat) return;
+  const item = (S.allItems[cat.id] || []).find(it => it.id === itemId); if(!item) return;
+  const pre = trkPrefillFromItem(item, cat);
+  if(kind !== 'register') delete pre.received_date;
+  if(kind !== 'register') pre.acquisition_method = '';
+  trkClosePick();
+  requirePin('เริ่มเรื่อง' + TRK_KIND_LABEL[kind], () => trkRenderEdit(null, Object.assign({ kind }, pre)));
+}
+
+/** จากเรื่อง → เปิดตารางหมวดของเครื่อง และค้นหาเครื่องนั้นให้ */
+async function trkGoItem(trkId){
+  const r = trkFind(trkId); if(!r || !r.item_id || !r.category_id) return;
+  const idx = S.categories.findIndex(c => c.id === r.category_id); if(idx < 0) return;
+  trkCloseModal();
+  await showCategory(r.category_id, idx);
+  const item = (S.allItems[r.category_id] || []).find(it => it.id === r.item_id);
+  let key = '';
+  if(item){ const pre = trkPrefillFromItem(item, S.categories[idx]); key = pre.asset_reg_no || pre.sn || ''; }
+  if(key){ document.getElementById('search-input').value = key; applyFilters(); }
+}
+
+// ─── Dashboard ขึ้นทะเบียน/จำหน่าย (รูปแบบเดียวกับระบบ Google Sheet เดิม) ───
+//  การ์ด/กราฟทุกชิ้นคลิกได้ → เปิดหน้าต่างรายการ (drill-down) ที่กรองตามเงื่อนไขนั้น
+//  เงื่อนไขเก็บเป็น predicate ใน TRK.dashItems แล้วอ้างด้วย index (ไม่ต้องฝังข้อความลงใน onclick)
+function trkDashItem(title, pred){ TRK.dashItems.push({ title, pred }); return TRK.dashItems.length - 1; }
+function trkMonthLabel(ym){
+  const m = /^(\d{4})-(\d{2})$/.exec(ym); if(!m) return ym;
+  return new Date(+m[1], +m[2]-1, 1).toLocaleDateString('th-TH', { month:'short', year:'numeric' });
+}
+function trkEmptyChart(){ return '<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px 0">ยังไม่มีข้อมูล</div>'; }
+/** entries: [[label, count, dashIdx], ...] */
+function trkDonutHtml(entries){
+  const total = entries.reduce((s,e)=>s+e[1],0);
+  if(!total) return trkEmptyChart();
+  const [cx,cy,r,inn] = [70,70,55,35]; let start = -Math.PI/2, paths = '';
+  entries.forEach(([label,val,di],i)=>{
+    const c = COLORS[i % COLORS.length];
+    if(val === total){ // ชิ้นเดียว 100% → วาดเป็นวงแหวน (arc ของ SVG วาดวงกลมเต็มวงไม่ได้)
+      paths += `<circle cx="${cx}" cy="${cy}" r="${(r+inn)/2}" fill="none" stroke="${c}" stroke-width="${r-inn}" class="donut-slice" onclick="trkDrillIdx(${di})"><title>${escHtml(label)}: ${val}</title></circle>`;
+      return;
+    }
+    const angle = val/total*Math.PI*2, end = start+angle;
+    const [x1,y1,x2,y2] = [cx+r*Math.cos(start),cy+r*Math.sin(start),cx+r*Math.cos(end),cy+r*Math.sin(end)];
+    const [xi1,yi1,xi2,yi2] = [cx+inn*Math.cos(start),cy+inn*Math.sin(start),cx+inn*Math.cos(end),cy+inn*Math.sin(end)];
+    const lg = angle > Math.PI ? 1 : 0;
+    paths += `<path class="donut-slice" d="M${xi1},${yi1} L${x1},${y1} A${r},${r} 0 ${lg} 1 ${x2},${y2} L${xi2},${yi2} A${inn},${inn} 0 ${lg} 0 ${xi1},${yi1}" fill="${c}" opacity=".9" onclick="trkDrillIdx(${di})"><title>${escHtml(label)}: ${val}</title></path>`;
+    start = end;
+  });
+  return `<div class="donut-wrap">
+    <svg width="140" height="140" viewBox="0 0 140 140">${paths}<text x="70" y="70" text-anchor="middle" dominant-baseline="middle" font-size="20" font-weight="700" style="fill:var(--text)">${total}</text><text x="70" y="86" text-anchor="middle" font-size="10" style="fill:var(--text-muted)">เรื่อง</text></svg>
+    <div class="donut-legend">${entries.map(([label,val,di],i)=>`
+      <div class="legend-item" onclick="trkDrillIdx(${di})" title="คลิกดูรายการ: ${escHtml(label)}">
+        <div class="legend-dot" style="background:${COLORS[i % COLORS.length]}"></div>
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(label)}</span><strong>${val}</strong>
+      </div>`).join('')}</div></div>`;
+}
+/** entries: [[label, count, dashIdx], ...] — แท่งแนวนอนแบบเดียวกับ Dashboard หลัก */
+function trkBarsHtml(entries, color){
+  if(!entries.length) return trkEmptyChart();
+  const max = Math.max(...entries.map(e=>e[1]), 1);
+  return entries.map(([label,val,di],i)=>`
+    <div class="bar-item" onclick="trkDrillIdx(${di})" title="คลิกดูรายการ: ${escHtml(label)}">
+      <div class="bar-label" title="${escHtml(label)}">${escHtml(label)}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.max(val/max*100,4)}%;background:${color || COLORS[i % COLORS.length]}"><span class="bar-val">${val}</span></div></div>
+    </div>`).join('');
+}
+/** แท่งปีงบประมาณ แยกสายแพทย์ / สายอื่นๆ (เหมือนกราฟ grouped bar ของระบบเดิม) */
+function trkFyHtml(kind, field, titleBase){
+  const groups = {};
+  TRK.rows.forEach(r => {
+    if(r.kind !== kind || !r[field]) return;
+    const fy = getFiscalYear(r[field]); if(!fy) return;
+    (groups[fy] = groups[fy] || { med:0, other:0 })[r.line === 'other' ? 'other' : 'med']++;
+  });
+  const fys = Object.keys(groups).sort();
+  if(!fys.length) return trkEmptyChart();
+  const max = Math.max(...fys.map(y => groups[y].med + groups[y].other), 1);
+  const seg = (fy, line, n, color) => {
+    if(!n) return '';
+    const di = trkDashItem(`${titleBase} — ปีงบฯ ${fy} — ${TRK_LINE_LABEL[line]}`, r => r.kind === kind && r.line === line && r[field] && String(getFiscalYear(r[field])) === fy);
+    return `<div onclick="event.stopPropagation();trkDrillIdx(${di})" title="${TRK_LINE_LABEL[line]}: ${n} — คลิกดูรายการ" style="width:${n/max*100}%;min-width:26px;background:${color};height:100%;display:flex;align-items:center;padding-left:8px;cursor:pointer"><span class="bar-val">${n}</span></div>`;
+  };
+  return `<div style="display:flex;gap:14px;font-size:11px;color:var(--text-muted);margin-bottom:4px">
+      <span><i class="legend-dot" style="display:inline-block;background:#3b82f6;vertical-align:middle"></i> สายแพทย์</span>
+      <span><i class="legend-dot" style="display:inline-block;background:#14b8a6;vertical-align:middle"></i> สายอื่นๆ</span></div>` +
+    fys.map(fy => {
+      const g = groups[fy];
+      const di = trkDashItem(`${titleBase} — ปีงบฯ ${fy}`, r => r.kind === kind && r[field] && String(getFiscalYear(r[field])) === fy);
+      return `<div class="bar-item" onclick="trkDrillIdx(${di})" title="ปีงบฯ ${fy}: ${g.med+g.other} เรื่อง">
+        <div class="bar-label">ปีงบฯ ${fy} <b>(${g.med+g.other})</b></div>
+        <div class="bar-track" style="display:flex">${seg(fy,'med',g.med,'#3b82f6')}${seg(fy,'other',g.other,'#14b8a6')}</div>
+      </div>`;
+    }).join('');
+}
+function trkRenderBigDash(){
+  const hdr = document.getElementById('trk-bd-header');
+  if(!TRK.loaded){ hdr.innerHTML = 'กำลังโหลดข้อมูล...'; return; }
+  TRK.dashItems = [];
+  const all = TRK.rows.map(r => ({ r, p: trkProgress(r) }));
+  const reg = all.filter(x => x.r.kind === 'register'), dis = all.filter(x => x.r.kind === 'dispose');
+  hdr.innerHTML = `<i class="fas fa-circle-info"></i> ขึ้นทะเบียน <b>${reg.length}</b> เรื่อง · จำหน่าย <b>${dis.length}</b> เรื่อง · รวม <b>${all.length}</b> เรื่อง
+    <span style="margin-left:6px">— "ขึ้นทะเบียนแล้ว" นับเมื่อถึงขั้นบันทึกขึ้นทะเบียน, การ์ด "รอ…" นับเรื่องที่ยังไปไม่ถึงขั้นนั้น</span>`;
+  const card = (icon, color, label, n, pred, sub) => {
+    const di = trkDashItem(label, pred);
+    return `<div class="stat-card" onclick="trkDrillIdx(${di})"><div class="stat-icon ${color}"><i class="fas ${icon}"></i></div>
+      <div class="stat-info"><div class="stat-label">${label}</div><div class="stat-value">${n}</div><div class="stat-sub">${sub || 'คลิกดูรายการ'}</div></div></div>`;
+  };
+  const cnt = (arr, f) => arr.filter(x => f(x.r, x.p)).length;
+  // แถว 1: ภาพรวม
+  const fReg = r => r.kind === 'register', fRegMed = r => r.kind === 'register' && r.line !== 'other', fRegOther = r => r.kind === 'register' && r.line === 'other', fDis = r => r.kind === 'dispose';
+  document.getElementById('trk-bd-row1').innerHTML =
+    card('fa-file-import','blue','ขึ้นทะเบียนทั้งหมด', reg.length, fReg) +
+    card('fa-hospital','green','ขึ้นทะเบียน สายแพทย์', cnt(reg, fRegMed), fRegMed) +
+    card('fa-box','purple','ขึ้นทะเบียน สายอื่นๆ', cnt(reg, fRegOther), fRegOther) +
+    card('fa-file-export','orange','จำหน่ายทั้งหมด', dis.length, fDis, `สายแพทย์ ${cnt(dis, r => r.line !== 'other')} · สายอื่นๆ ${cnt(dis, r => r.line === 'other')}`);
+  // แถว 2: สถานะ
+  const fRegDone = (r,p) => r.kind === 'register' && p.complete, fRegPend = (r,p) => r.kind === 'register' && !p.complete;
+  const fWait = k => (r,p) => r.kind === 'dispose' && p.last < k; // ยังไปไม่ถึงขั้นที่ k
+  document.getElementById('trk-bd-row2').innerHTML =
+    card('fa-circle-check','green','ขึ้นทะเบียนแล้ว', cnt(reg, fRegDone), fRegDone) +
+    card('fa-hourglass-half','orange','ค้างขึ้นทะเบียน', cnt(reg, fRegPend), fRegPend) +
+    card('fa-clipboard-list','orange','รอเรื่องขอจำหน่าย', cnt(dis, fWait(1)), fWait(1)) +
+    card('fa-magnifying-glass','purple','รอสอบข้อเท็จจริง', cnt(dis, fWait(2)), fWait(2)) +
+    card('fa-tag','blue','รอเรื่องคืนซาก', cnt(dis, fWait(3)), fWait(3));
+  // การได้มา (เฉพาะขึ้นทะเบียน)
+  const srcMap = {}; reg.forEach(x => { const k = (x.r.acquisition_method || '').trim() || 'ไม่ระบุ'; srcMap[k] = (srcMap[k]||0) + 1; });
+  document.getElementById('trk-bd-source').innerHTML = trkDonutHtml(Object.entries(srcMap).sort((a,b)=>b[1]-a[1]).map(([k,v]) =>
+    [k, v, trkDashItem('การได้มา — ' + k, r => r.kind === 'register' && (((r.acquisition_method||'').trim()) || 'ไม่ระบุ') === k)]));
+  // สถานะการขึ้นทะเบียน (ขั้นปัจจุบัน)
+  const stMap = {}; reg.forEach(x => { const k = trkStageText(x.p); stMap[k] = (stMap[k]||0) + 1; });
+  document.getElementById('trk-bd-regstage').innerHTML = trkDonutHtml(Object.entries(stMap).sort((a,b)=>b[1]-a[1]).map(([k,v]) =>
+    [k, v, trkDashItem('สถานะการขึ้นทะเบียน — ' + k, (r,p) => r.kind === 'register' && trkStageText(p) === k)]));
+  // รายเดือน
+  const monthBars = (arr, kind, field, title, color) => {
+    const m = {}; arr.forEach(x => { const v = String(x.r[field]||''); if(/^\d{4}-\d{2}/.test(v)){ const k = v.slice(0,7); m[k] = (m[k]||0) + 1; } });
+    return trkBarsHtml(Object.keys(m).sort().map(k => [trkMonthLabel(k), m[k], trkDashItem(title + ' — ' + trkMonthLabel(k), r => r.kind === kind && String(r[field]||'').slice(0,7) === k)]), color);
+  };
+  document.getElementById('trk-bd-mreg').innerHTML = monthBars(reg, 'register', 'received_date', 'รับมา (ขอขึ้นทะเบียน)', '#3b82f6');
+  document.getElementById('trk-bd-msold').innerHTML = monthBars(dis, 'dispose', 'dispose_request_date', 'ขอจำหน่าย', '#f59e0b');
+  // ปีงบประมาณ
+  document.getElementById('trk-bd-fyreg').innerHTML   = trkFyHtml('register', 'reg_approve_date',     'อนุมัติขึ้นทะเบียน');
+  document.getElementById('trk-bd-fysold2').innerHTML = trkFyHtml('dispose',  'dispose_approve_date', 'อนุมัติจำหน่าย');
+  document.getElementById('trk-bd-fyreg2').innerHTML  = trkFyHtml('register', 'reg_record_date',      'บันทึกขึ้นทะเบียน');
+  document.getElementById('trk-bd-fysold').innerHTML  = trkFyHtml('dispose',  'dispose_record_date',  'บันทึกจำหน่าย');
+  // Top 10 ชื่อครุภัณฑ์
+  const nm = {}; all.forEach(x => { const k = (x.r.item_name||'').trim() || 'ไม่ระบุ'; nm[k] = (nm[k]||0) + 1; });
+  document.getElementById('trk-bd-top').innerHTML = trkBarsHtml(Object.entries(nm).sort((a,b)=>b[1]-a[1] || a[0].localeCompare(b[0],'th')).slice(0,10)
+    .map(([k,v]) => [k, v, trkDashItem('ครุภัณฑ์ — ' + k, r => ((r.item_name||'').trim() || 'ไม่ระบุ') === k)]));
+}
+
+// ─── หน้าต่างรายการ (drill-down) ───
+function trkDrillIdx(i){
+  const d = TRK.dashItems[i]; if(!d) return;
+  TRK.drill = d;
+  document.getElementById('trk-drill-search').value = '';
+  trkRenderDrill();
+  document.getElementById('trk-drill-overlay').classList.add('show');
+}
+function trkCloseDrill(){ document.getElementById('trk-drill-overlay').classList.remove('show'); }
+function trkDrillRows(){
+  if(!TRK.drill) return [];
+  const q = document.getElementById('trk-drill-search').value.trim().toLowerCase();
+  return TRK.rows.map(r => ({ r, p: trkProgress(r) }))
+    .filter(x => TRK.drill.pred(x.r, x.p))
+    .filter(x => !q || TRK_TEXT_FIELDS.map(f => x.r[f]||'').concat(Object.values(x.r.step_text||{})).join(' ').toLowerCase().includes(q))
+    .sort(trkSortCmp);
+}
+function trkRenderDrill(){
+  const rows = trkDrillRows();
+  document.getElementById('trk-drill-title').innerHTML = `<i class="fas fa-filter" style="color:var(--primary)"></i> ${escHtml(TRK.drill ? TRK.drill.title : '')}`;
+  document.getElementById('trk-drill-count').textContent = rows.length + ' เรื่อง';
+  document.getElementById('trk-drill-thead').innerHTML = `<tr><th style="width:44px">#</th><th>เครื่อง / ทะเบียนครุภัณฑ์</th><th>ประเภท</th><th>S/N · INH · NVH</th><th>ขั้นตอน</th><th>สถานะ</th><th>ค้าง</th></tr>`;
+  document.getElementById('trk-drill-tbody').innerHTML = rows.length ? rows.map(({r,p},i) => {
+    const ids = [r.sn && 'S/N '+r.sn, r.inh_no && 'INH '+r.inh_no, r.nvh_no && 'NVH '+r.nvh_no].filter(Boolean).join(' · ');
+    return `<tr>
+      <td style="color:var(--text-muted);font-size:11px">${i+1}</td>
+      <td style="max-width:280px"><span class="trk-link" onclick="trkOpenView(${r.id})">${escHtml(r.item_name)}</span><div class="trk-sub">${escHtml(r.asset_reg_no || '—')} · ${escHtml(TRK_LINE_LABEL[r.line] || r.line)}</div></td>
+      <td><span class="trk-sub">${TRK_KIND_LABEL[r.kind]}</span></td>
+      <td style="max-width:200px" title="${escHtml(ids)}"><span class="trk-sub">${escHtml(ids || '—')}</span></td>
+      <td>${trkDotsHtml(p)} <span class="trk-sub">${p.last+1}/${p.steps.length}</span></td>
+      <td>${trkStatusHtml(p)}</td>
+      <td>${trkAgeHtml(p)}</td></tr>`;
+  }).join('') : `<tr><td colspan="99" style="text-align:center;padding:40px;color:var(--text-muted)">ไม่พบเรื่อง</td></tr>`;
+}
+function trkExportDrill(){
+  const rows = trkDrillRows();
+  const allSteps = TRK_STEPS.register.map(s => ['register', s]).concat(TRK_STEPS.dispose.map(s => ['dispose', s]));
+  const headers = ['ประเภท','สาย','ชื่อเครื่อง/พัสดุ','หมายเลขทะเบียนครุภัณฑ์','S/N','INH No.','NVH No.','การได้มา']
+    .concat(allSteps.map(([k,s]) => TRK_KIND_LABEL[k] + ': ' + s.l))
+    .concat(['ขั้นปัจจุบัน','ค้าง (วัน)','ปีงบฯ ที่เสร็จ','รายการพัสดุ (id)','หมายเหตุ']);
+  let csv = '﻿' + headers.map(h => '"' + h + '"').join(',') + '\n';
+  rows.forEach(({r,p}) => {
+    const vals = [TRK_KIND_LABEL[r.kind], TRK_LINE_LABEL[r.line]||r.line, r.item_name, r.asset_reg_no, r.sn, r.inh_no, r.nvh_no, r.acquisition_method]
+      .concat(allSteps.map(([k,s]) => k === r.kind ? (r[s.k] || trkStepText(r, s.k)) : ''))
+      .concat([trkStageText(p), p.days === null ? '' : p.days, p.fy || '', r.item_id || '', r.note]);
+    csv += vals.map(v => '"' + csvSafe(v === null || v === undefined ? '' : String(v)).replace(/"/g,'""') + '"').join(',') + '\n';
+  });
+  dlBlob(new Blob([csv], { type:'text/csv;charset=utf-8' }), 'รายการ_' + trkYmd(new Date()) + '.csv');
+}
+
+// ─── ส่งออก ───
+function trkExport(type){
+  const kind = TRK.kind, steps = TRK_STEPS[kind];
+  const headers = ['ประเภท','สาย','ชื่อเครื่อง/พัสดุ','คุณลักษณะ/คุณสมบัติ','หมายเลขทะเบียนครุภัณฑ์','S/N','INH No.','NVH No.']
+    .concat(kind === 'register' ? ['การได้มา'] : [])
+    .concat(steps.map(s => s.l))
+    .concat(['ขั้นปัจจุบัน','ค้าง (วัน)','ปีงบฯ ที่เสร็จ','รายการพัสดุ (id)','หมายเหตุ']);
+  const rows = TRK.filtered.map(({r,p}) => [TRK_KIND_LABEL[r.kind], TRK_LINE_LABEL[r.line]||r.line, r.item_name, r.spec, r.asset_reg_no, r.sn, r.inh_no, r.nvh_no]
+    .concat(kind === 'register' ? [r.acquisition_method] : [])
+    .concat(steps.map(s => r[s.k] || trkStepText(r, s.k)))
+    .concat([trkStageText(p), p.days === null ? '' : p.days, p.fy || '', r.item_id || '', r.note])
+    .map(v => csvSafe(v === null || v === undefined ? '' : String(v))));
+  const name = 'ติดตาม' + TRK_KIND_LABEL[kind] + '_' + trkYmd(new Date());
+  if(type === 'csv'){
+    let csv = '﻿' + headers.join(',') + '\n';
+    rows.forEach(row => { csv += row.map(v => '"' + v.replace(/"/g,'""') + '"').join(',') + '\n'; });
+    dlBlob(new Blob([csv], { type:'text/csv;charset=utf-8' }), name + '.csv');
+  } else {
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, ('ติดตาม' + TRK_KIND_LABEL[kind]).substring(0,31));
+    XLSX.writeFile(wb, name + '.xlsx');
+  }
+}
 </script>
 </body>
 </html>
