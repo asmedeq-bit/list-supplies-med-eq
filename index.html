@@ -3743,7 +3743,7 @@ function trkRenderEdit(row, base){
   const inp = (id, label, v, full, req) => `<div class="form-group ${full?'full':''}"><label class="form-label">${label}${req?' <span style="color:var(--danger)">*</span>':''}</label><input type="text" class="plain-input" id="trk-e-${id}" value="${escHtml(v||'')}"></div>`;
   document.getElementById('trk-modal-title').innerHTML = `<i class="fas ${row?'fa-edit':'fa-plus-circle'}" style="color:${row?'var(--primary)':'var(--success)'}"></i> ${row?'แก้ไข':'เพิ่ม'}เรื่อง${TRK_KIND_LABEL[r.kind]}`;
   document.getElementById('trk-modal-body').innerHTML = `
-    ${r.item_id ? `<div class="trk-info"><i class="fas fa-link"></i> เชื่อมกับรายการพัสดุ <b>#${r.item_id}</b> ${escHtml(cat?'('+cat.name+')':'')} — เมื่อบันทึก ระบบจะเสนอให้อัปเดตสถานะในรายการพัสดุ (ต้องกดยืนยันก่อนเสมอ)</div>`
+    ${r.item_id ? `<div class="trk-info"><i class="fas fa-link"></i> เชื่อมกับรายการพัสดุ <b>#${r.item_id}</b> ${escHtml(cat?'('+cat.name+')':'')} — เมื่อบันทึก ระบบจะตรวจสถานะในรายการพัสดุ ถ้าไม่ตรงกับขั้นงานจะเสนอให้อัปเดต (ต้องกดยืนยันก่อนเสมอ) ถ้าตรงอยู่แล้วจะแจ้งว่าไม่ต้องเปลี่ยน</div>`
       : `<div class="trk-info"><i class="fas fa-circle-info"></i> เรื่องนี้ไม่ได้เชื่อมกับรายการพัสดุ — ถ้าเครื่องยังอยู่ในรายการพัสดุ แนะนำให้เริ่มเรื่องจากปุ่ม <i class="fas fa-route"></i> ที่แถวของเครื่องในตาราง เพื่อดึงข้อมูลเครื่องและเชื่อมสถานะอัตโนมัติ</div>`}
     <div id="trk-e-sync"></div>
     <div class="form-grid">
@@ -3833,7 +3833,8 @@ function trkStatusGroup(s){
   return s;
 }
 async function trkMaybeSync(r){
-  if(!r || !r.item_id) return;
+  if(!r) return;
+  if(!r.item_id){ toast('เรื่องนี้ไม่ได้เชื่อมกับรายการพัสดุ จึงไม่มีสถานะให้อัปเดต'); return; }
   const p = trkProgress(r);
   let target = null, regNo = null;
   if(r.kind === 'dispose'){
@@ -3843,13 +3844,15 @@ async function trkMaybeSync(r){
   } else if(r.kind === 'register' && p.complete){
     target = 'ใช้ราชการได้'; regNo = (r.asset_reg_no || '').trim();
   }
-  if(!target) return;
+  const finalHint = r.kind === 'dispose' ? 'จำหน่าย' : 'ใช้ราชการได้';
+  if(!target){ toast(`สถานะในรายการพัสดุ #${r.item_id} ยังไม่ต้องเปลี่ยน — จะเสนอเปลี่ยนเป็น "${finalHint}" เมื่อบันทึกขั้นสุดท้าย`); return; }
   let item;
   try {
     const { data, error } = await sb.from('items').select('id,status,category_id,data').eq('id', r.item_id).maybeSingle();
-    if(error || !data) return;
+    if(error) throw error;
+    if(!data){ toast(`ไม่พบรายการพัสดุ #${r.item_id} (อาจถูกลบไปแล้ว) จึงไม่ได้อัปเดตสถานะ`, 'error'); return; }
     item = data;
-  } catch(e){ return; }
+  } catch(e){ toast('ตรวจสถานะในรายการพัสดุไม่สำเร็จ: ' + e.message, 'error'); return; }
   const cur = normalizeStatus(item.status || '');
   const curG = trkStatusGroup(cur), tgtG = trkStatusGroup(target);
   const cat = S.categories.find(c => c.id === item.category_id);
@@ -3862,7 +3865,10 @@ async function trkMaybeSync(r){
     else if(tgtG === 'wait' && curG === 'wait') statusChange = false;           // อยู่ระหว่างจำหน่ายอยู่แล้ว (เช่น รอใบ decom)
     else if(tgtG === 'broken' && (curG === 'broken' || curG === 'wait')) statusChange = false;
   }
-  if(!statusChange && !regChange) return;
+  if(!statusChange && !regChange){
+    toast(`สถานะในรายการพัสดุ #${item.id} สอดคล้องกับขั้นงานแล้ว: "${cur || 'ไม่ระบุ'}" — ไม่ต้องเปลี่ยน` + (p.complete ? '' : ` (จะเสนอเปลี่ยนเป็น "${finalHint}" เมื่อบันทึกขั้นสุดท้าย)`));
+    return;
+  }
   const lines = [];
   if(statusChange) lines.push(`<div style="margin-bottom:6px"><b>สถานะ:</b> <span class="status-badge ${getStCls(cur)}">${escHtml(cur || 'ไม่ระบุ')}</span> <i class="fas fa-arrow-right" style="font-size:11px;color:var(--text-muted)"></i> <span class="status-badge ${getStCls(target)}">${escHtml(target)}</span></div>`);
   if(regChange) lines.push(`<div><b>หมายเลขทะเบียนครุภัณฑ์:</b> ${escHtml(curReg || '(ว่าง)')} <i class="fas fa-arrow-right" style="font-size:11px;color:var(--text-muted)"></i> ${escHtml(regNo)}</div>`);
