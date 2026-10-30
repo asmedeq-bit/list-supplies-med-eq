@@ -360,6 +360,36 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
 .trk-attach:hover{border-color:var(--primary);background:var(--primary-light)}
 .trk-log-row{font-size:12px;padding:7px 0;border-bottom:1px dashed var(--border);line-height:1.6}
 .trk-log-row:last-child{border-bottom:none}
+/* ── BM: ตารางสรุปตามประเภท / ยี่ห้อ / รุ่น / สถานะภาพ (หน้า Dashboard) ── */
+.bm-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.bm-seg{display:inline-flex;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;flex-shrink:0}
+.bm-seg button{border:none;background:var(--card);color:var(--text-muted);font-family:inherit;font-size:12px;font-weight:600;padding:7px 12px;cursor:pointer;white-space:nowrap}
+.bm-seg button+button{border-left:1.5px solid var(--border)}
+.bm-seg button.active{background:var(--primary);color:#fff}
+.bm-search{position:relative;flex:1;min-width:180px}
+.bm-search i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:12px}
+.bm-search input{width:100%;padding:7px 10px 7px 30px;border:1.5px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-family:inherit;font-size:13px}
+.bm-select{padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-family:inherit;font-size:13px;max-width:220px}
+.bm-check{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--text-muted);cursor:pointer;white-space:nowrap}
+.bm-summary{font-size:12px;color:var(--text-muted);margin-bottom:8px}
+.bm-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px}
+.bm-table{width:100%;border-collapse:collapse;font-size:13px;min-width:700px}
+.bm-table th{background:var(--thead-bg);color:var(--text-muted);font-size:12px;font-weight:700;padding:9px 10px;border-bottom:2px solid var(--border);text-align:center;white-space:nowrap}
+.bm-table th:first-child,.bm-table td:first-child{text-align:left}
+.bm-table td{padding:7px 10px;border-bottom:1px solid var(--border);text-align:center}
+.bm-table td:first-child i.bm-caret{width:14px;color:var(--text-muted);font-size:11px}
+.bm-table tr.bm-tg td{cursor:pointer}
+.bm-table tr.bm-l0 td{background:var(--hover-bg);font-weight:700}
+.bm-table tr.bm-l1 td{font-weight:600}
+.bm-table tr.bm-l1 td:first-child{padding-left:28px}
+.bm-table tr.bm-l2 td:first-child{padding-left:56px;font-weight:400}
+.bm-table tr.bm-total td{font-weight:700;border-top:2px solid var(--border);border-bottom:none}
+.bm-table td.bm-sum{font-weight:700}
+.bm-cnt{color:var(--text-muted);font-weight:400;font-size:12px}
+.bm-num{cursor:pointer;font-weight:700;padding:1px 6px;border-radius:6px}
+.bm-num:hover{background:var(--primary-light);text-decoration:underline}
+.bm-zero{color:var(--border)}
+.bm-muted{color:var(--text-muted);font-style:italic;font-weight:400}
 /* ── MOBILE: หน้าจอแคบ (มือถือ) — เมนูซ้ายเป็นลิ้นชักเปิดด้วยปุ่ม ☰ · จอคอมไม่เปลี่ยน ── */
 .btn-menu{display:none;width:38px;height:38px;border-radius:9px;border:1.5px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 #sidebar-backdrop{display:none}
@@ -508,6 +538,23 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
               <svg id="donut-svg" width="140" height="140" viewBox="0 0 140 140"></svg>
               <div class="donut-legend" id="donut-legend"></div>
             </div>
+          </div>
+          <!-- BM: ตารางสรุปตามประเภท / ยี่ห้อ / รุ่น / สถานะภาพ -->
+          <div class="chart-card" style="margin-bottom:16px" id="bm-card">
+            <div class="chart-title"><i class="fas fa-table-list" style="color:#0f766e"></i> <span id="bm-title">สรุปตามประเภท / ยี่ห้อ / รุ่น / สถานะภาพ</span> <span style="font-size:11px;color:var(--text-muted);font-weight:400;margin-left:6px">กดชื่อเพื่อเปิด/พับ · กดตัวเลขเพื่อดูรายการ</span></div>
+            <div class="bm-toolbar">
+              <div class="bm-seg" role="group" aria-label="มุมมอง">
+                <button type="button" id="bm-mode-cat" class="active" onclick="bmSetMode('cat')"><i class="fas fa-layer-group"></i> ตามประเภท</button>
+                <button type="button" id="bm-mode-brand" onclick="bmSetMode('brand')"><i class="fas fa-tags"></i> ตามยี่ห้อ</button>
+              </div>
+              <div class="bm-search"><i class="fas fa-search"></i><input type="text" id="bm-search" placeholder="ค้นหาประเภท / ยี่ห้อ / รุ่น..." oninput="bmDraw()"></div>
+              <select id="bm-cat" class="bm-select" onchange="bmDraw()"><option value="">ทุกประเภท</option></select>
+              <label class="bm-check"><input type="checkbox" id="bm-hide-done" onchange="bmDraw()"> ซ่อนที่จำหน่ายแล้ว</label>
+              <button class="btn btn-ghost btn-sm" id="bm-toggle-all" onclick="bmToggleAll()"><i class="fas fa-angles-down"></i> ขยายทั้งหมด</button>
+              <button class="btn btn-ghost btn-sm" onclick="bmExport()"><i class="fas fa-file-excel"></i> Excel</button>
+            </div>
+            <div id="bm-summary" class="bm-summary"></div>
+            <div class="bm-wrap" id="bm-body"><div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px 0">กำลังคำนวณ...</div></div>
           </div>
           <div class="chart-grid">
             <div class="chart-card">
@@ -1642,6 +1689,220 @@ function renderDashboard(st){
     </div>`).join('');
 }
 
+// ─── BM: ตารางสรุปตามประเภท / ยี่ห้อ / รุ่น / สถานะภาพ ───
+//  คำนวณจากข้อมูลที่ Dashboard โหลดไว้แล้ว (S.allItems) — อ่านอย่างเดียว ไม่แก้ฐานข้อมูล
+//  2 มุมมอง: ตามประเภท (ประเภท → ยี่ห้อ → รุ่น) · ตามยี่ห้อ (ยี่ห้อ → ประเภท → รุ่น ยี่ห้อเดียวกันรวมข้ามประเภท)
+//  ยี่ห้อ/รุ่น: จากคอลัมน์ "ยี่ห้อ" และ "รุ่น" · ตัวพิมพ์เล็ก-ใหญ่/ช่องว่างต่างกันนับเป็นค่าเดียว (แสดงตามค่าที่พบบ่อยสุด)
+//  ไม่เดาแยกยี่ห้อจากข้อความ — ถ้าช่องยี่ห้อกรอกต่างกัน จะแยกกลุ่มตามที่กรอกจริง
+//  สถานะ: อ่านแบบเดียวกับหน้าต่างรายการสถานะ (คอลัมน์สถานะภาพ) แล้วจัดกลุ่มตามกติกาเดียวกับระบบติดตาม (trkStatusGroup)
+const BM_COLS = [
+  { k:'ok',     l:'ใช้ราชการได้',   c:'#10b981' },
+  { k:'broken', l:'ชำรุด',          c:'#ef4444' },
+  { k:'wait',   l:'ระหว่างจำหน่าย', c:'#d97706' },
+  { k:'done',   l:'จำหน่ายแล้ว',    c:'#6366f1' },
+  { k:'other',  l:'อื่นๆ',          c:'#64748b' },
+  { k:'none',   l:'ไม่ระบุ',        c:'#94a3b8' }
+];
+const BM_NONE = '\u0002';   // ประเภทนี้ไม่มีคอลัมน์ยี่ห้อ/รุ่น
+const BM_SEP = '\u0001';
+const BM_LEVEL = { cat:['c','b','m'], brand:['b','c','m'] };
+const BM_LEVEL_LABEL = { c:'ประเภท', b:'ยี่ห้อ', m:'รุ่น' };
+const BM = { mode:'cat', leaves:[], names:{ b:{}, m:{} }, catName:{}, open:new Set(), cells:[], tgl:[], view:[] };
+function bmZero(){ const o = {}; BM_COLS.forEach(c => { o[c.k] = 0; }); return o; }
+function bmNorm(v){ return trkClean(v).replace(/\s+/g,' ').trim(); }
+function bmGroup(sv){
+  sv = String(sv||'').trim();
+  if(!sv || sv === 'ไม่ระบุ' || sv === 'ไม่ระบุสถานะ') return 'none';
+  if(sv === 'ใช้ราชการได้') return 'ok';
+  const g = trkStatusGroup(sv);
+  return (g === 'done' || g === 'wait' || g === 'broken') ? g : 'other';
+}
+function bmColIdx(headers){
+  const n = headers.map(normH);
+  let b = n.indexOf('ยี่ห้อ'); if(b < 0) b = n.findIndex(h => h.includes('ยี่ห้อ'));
+  let m = n.indexOf('รุ่น');   if(m < 0) m = n.findIndex((h,i) => i !== b && /^รุ่น/.test(h));
+  return { b, m, s: headers.findIndex(isStatusCol) };
+}
+/** ข้อมูลของเครื่อง 1 รายการ: leaf = ประเภท+ยี่ห้อ+รุ่น (หน่วยย่อยสุดที่ใช้ทั้ง 2 มุมมอง) */
+function bmItemInfo(it, headers, ci, catId){
+  const b = ci.b >= 0 ? bmNorm(it.data?.[headers[ci.b]]) : null;
+  const m = ci.m >= 0 ? bmNorm(it.data?.[headers[ci.m]]) : null;
+  const bk = b === null ? BM_NONE : b.toLowerCase();
+  const mk = m === null ? BM_NONE : m.toLowerCase();
+  const k = bmGroup(ci.s >= 0 ? normalizeStatus(it.data?.[headers[ci.s]]) : '');
+  return { b, m, bk, mk, k, leaf: catId + BM_SEP + bk + BM_SEP + mk };
+}
+function bmCompute(){
+  const leaves = {}, bn = {}, mn = {}, catName = {};
+  const tally = (o, key, val) => { if(!key || key === BM_NONE) return; const x = o[key] || (o[key] = {}); x[val] = (x[val]||0) + 1; };
+  S.categories.forEach(cat => {
+    const items = S.allItems[cat.id] || []; if(!items.length) return;
+    catName[cat.id] = cat.name;
+    const headers = cat.headers || []; const ci = bmColIdx(headers);
+    items.forEach(it => {
+      const inf = bmItemInfo(it, headers, ci, cat.id);
+      const L = leaves[inf.leaf] || (leaves[inf.leaf] = { leaf:inf.leaf, c:cat.id, b:inf.bk, m:inf.mk, n:bmZero() });
+      L.n[inf.k]++;
+      tally(bn, inf.bk, inf.b); tally(mn, inf.mk, inf.m);
+    });
+  });
+  const pick = o => { const r = {}; Object.keys(o).forEach(k => { r[k] = Object.entries(o[k]).sort((a,b) => b[1]-a[1])[0][0]; }); return r; };
+  BM.leaves = Object.values(leaves); BM.names = { b:pick(bn), m:pick(mn) }; BM.catName = catName;
+}
+function bmLabel(lv, key){
+  if(lv === 'c') return BM.catName[key] || '';
+  if(key === BM_NONE) return lv === 'b' ? '(ไม่มีคอลัมน์ยี่ห้อ)' : '(ไม่มีคอลัมน์รุ่น)';
+  if(key === '') return lv === 'b' ? '(ไม่ระบุยี่ห้อ)' : '(ไม่ระบุรุ่น)';
+  return BM.names[lv][key] || key;
+}
+function bmLabelHtml(lv, key){
+  const t = escHtml(bmLabel(lv, key));
+  return (lv !== 'c' && (key === BM_NONE || key === '')) ? `<span class="bm-muted">${t}</span>` : t;
+}
+function bmRender(){
+  if(!document.getElementById('bm-body')) return;
+  bmCompute();
+  const sel = document.getElementById('bm-cat'), cur = sel.value;
+  const cats = S.categories.filter(c => BM.catName[c.id] !== undefined);
+  sel.innerHTML = '<option value="">ทุกประเภท</option>' + cats.map(c => `<option value="${c.id}">${escHtml(c.name)}</option>`).join('');
+  if(cats.some(c => String(c.id) === cur)) sel.value = cur;
+  bmDraw();
+}
+function bmSetMode(mode){
+  if(!BM_LEVEL[mode] || BM.mode === mode) return;
+  BM.mode = mode;
+  document.getElementById('bm-mode-cat').classList.toggle('active', mode === 'cat');
+  document.getElementById('bm-mode-brand').classList.toggle('active', mode === 'brand');
+  document.getElementById('bm-title').textContent = mode === 'brand' ? 'สรุปตามยี่ห้อ / ประเภท / รุ่น / สถานะภาพ' : 'สรุปตามประเภท / ยี่ห้อ / รุ่น / สถานะภาพ';
+  bmDraw();
+}
+/** สร้างโครงสร้างตาราง (tree) ตามมุมมองและตัวกรอง — ใช้ร่วมกันระหว่างตาราง การกดตัวเลข และ Excel */
+function bmBuildView(){
+  const q = (document.getElementById('bm-search').value || '').trim().toLowerCase();
+  const catSel = document.getElementById('bm-cat').value;
+  const hide = document.getElementById('bm-hide-done').checked;
+  const cols = hide ? BM_COLS.filter(c => c.k !== 'done') : BM_COLS;
+  const sum = n => cols.reduce((s,c) => s + n[c.k], 0);
+  const sumN = ls => { const n = bmZero(); ls.forEach(L => BM_COLS.forEach(c => { n[c.k] += L.n[c.k]; })); return n; };
+  const order = BM_LEVEL[BM.mode];
+  const sortNodes = nodes => nodes.sort((a,b) => sum(b.n) - sum(a.n) || a.text.localeCompare(b.text, 'th'));
+  const build = (list, depth, path) => {
+    const lv = order[depth], groups = new Map();
+    list.forEach(L => { const k = L[lv]; if(!groups.has(k)) groups.set(k, []); groups.get(k).push(L); });
+    return sortNodes([...groups.entries()].map(([key, ls]) => {
+      const node = { id: path + BM_SEP + key, lv, key, depth, text: bmLabel(lv, key), leaves: ls, n: sumN(ls), children: null };
+      if(depth < order.length - 1){
+        const ch = build(ls, depth + 1, node.id);
+        // ชั้นถัดไปมีแค่ "(ไม่มีคอลัมน์…)" อย่างเดียว → ข้ามชั้นนั้น ไม่ต้องแสดงแถวซ้ำ
+        node.children = (ch.length === 1 && ch[0].key === BM_NONE) ? ch[0].children : ch;
+      }
+      return node;
+    }));
+  };
+  const prune = nodes => sortNodes(nodes.map(nd => {
+    if(nd.text.toLowerCase().includes(q)) return nd;
+    if(!nd.children) return null;
+    const ch = prune(nd.children); if(!ch.length) return null;
+    const ls = ch.flatMap(c => c.leaves);
+    return Object.assign({}, nd, { children: ch, leaves: ls, n: sumN(ls) });
+  }).filter(Boolean));
+  const leaves = BM.leaves.filter(L => (!catSel || String(L.c) === catSel) && sum(L.n) > 0);
+  let view = build(leaves, 0, BM.mode);
+  if(q) view = prune(view);
+  return { q, hide, cols, sum, sumN, order, view };
+}
+function bmDraw(){
+  const body = document.getElementById('bm-body'); if(!body) return;
+  const { q, hide, cols, sum, sumN, order, view } = bmBuildView();
+  BM.cells = []; BM.tgl = []; BM.view = view;
+  const visLeaves = view.flatMap(v => v.leaves), grand = sumN(visLeaves);
+  const cell = (leaves, grps, label, color, n, cls='') => {
+    if(!n) return `<td class="${cls}"><span class="bm-zero">–</span></td>`;
+    const i = BM.cells.push({ leaves: leaves.map(L => L.leaf), grps, label, color }) - 1;
+    return `<td class="${cls}"><span class="bm-num" style="color:${color}" onclick="event.stopPropagation();bmOpen(${i})">${n.toLocaleString()}</span></td>`;
+  };
+  const allGrps = cols.map(c => c.k), allLbl = hide ? 'ทุกสถานะ (ไม่นับจำหน่ายแล้ว)' : 'ทุกสถานะ';
+  const cellsOf = (leaves, name, n) => cols.map(c => cell(leaves, [c.k], name + ' · ' + c.l, c.c, n[c.k])).join('')
+    + cell(leaves, allGrps, name + ' · ' + allLbl, '#0f766e', sum(n), 'bm-sum');
+  const distinct = (lv) => new Set(visLeaves.map(L => L[lv]).filter(k => k !== BM_NONE && k !== '')).size;
+  document.getElementById('bm-summary').textContent = view.length
+    ? `${distinct('c').toLocaleString()} ประเภท · ${distinct('b').toLocaleString()} ยี่ห้อ · ${distinct('m').toLocaleString()} รุ่น · รวม ${sum(grand).toLocaleString()} รายการ` + (hide ? ' (ไม่นับที่จำหน่ายแล้ว)' : '')
+    : '';
+  const expandable = []; const walk = ns => ns.forEach(nd => { if(nd.children){ expandable.push(nd.id); walk(nd.children); } }); walk(view);
+  const allOpen = expandable.length > 0 && expandable.every(id => BM.open.has(id));
+  document.getElementById('bm-toggle-all').innerHTML = allOpen ? '<i class="fas fa-angles-up"></i> พับทั้งหมด' : '<i class="fas fa-angles-down"></i> ขยายทั้งหมด';
+  if(!view.length){ body.innerHTML = `<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px 0">${BM.leaves.length ? 'ไม่พบรายการที่ตรงกับตัวกรอง' : 'ยังไม่มีข้อมูล'}</div>`; return; }
+  const rows = [];
+  const emit = (nodes, pathText) => nodes.forEach(nd => {
+    const name = pathText ? pathText + ' · ' + nd.text : nd.text;
+    const open = !!nd.children && (!!q || BM.open.has(nd.id));
+    const caret = nd.children ? `<i class="fas fa-chevron-${open ? 'down' : 'right'} bm-caret"></i> ` : '';
+    const cnt = nd.children ? ` <span class="bm-cnt">(${nd.children.length})</span>` : '';
+    const tg = nd.children ? ` bm-tg" onclick="bmToggleI(${BM.tgl.push(nd.id) - 1})" title="กดเพื่อ${open ? 'พับ' : 'เปิด'}` : '';
+    rows.push(`<tr class="bm-l${nd.depth}${tg}"><td>${caret}${bmLabelHtml(nd.lv, nd.key)}${cnt}</td>${cellsOf(nd.leaves, name, nd.n)}</tr>`);
+    if(open) emit(nd.children, name);
+  });
+  emit(view, '');
+  body.innerHTML = `<table class="bm-table"><thead><tr><th>${order.map(l => BM_LEVEL_LABEL[l]).join(' / ')}</th>${cols.map(c => `<th style="color:${c.c}">${c.l}</th>`).join('')}<th>รวม</th></tr></thead>
+    <tbody>${rows.join('')}<tr class="bm-total"><td>รวมทั้งหมด</td>${cellsOf(visLeaves, 'ทั้งหมดที่แสดง', grand)}</tr></tbody></table>`;
+}
+function bmToggleI(i){ if(BM.tgl[i] !== undefined) bmToggle(BM.tgl[i]); }
+function bmToggle(id){ if(BM.open.has(id)) BM.open.delete(id); else BM.open.add(id); bmDraw(); }
+function bmToggleAll(){
+  const ids = []; const walk = ns => ns.forEach(nd => { if(nd.children){ ids.push(nd.id); walk(nd.children); } }); walk(BM.view);
+  const allOpen = ids.length > 0 && ids.every(id => BM.open.has(id));
+  ids.forEach(id => { if(allOpen) BM.open.delete(id); else BM.open.add(id); });
+  bmDraw();
+}
+function bmOpen(i){ const c = BM.cells[i]; if(c) bmOpenSel(c.leaves, c.grps, c.label, c.color); }
+/** เปิดหน้าต่างรายการเดิม (status-overlay) เฉพาะเครื่องในกลุ่ม (leaf) ที่แสดงในแถวนั้น และสถานะที่กด */
+async function bmOpenSel(leaves, grps, label, color){
+  const want = new Set(leaves);
+  smState.statusFilter = '__BM__'; smState.color = color; smState.smPage = 1;
+  document.getElementById('sm-search-input').value = '';
+  const badge = document.getElementById('sm-badge');
+  const bl = grps.length === 1 ? (BM_COLS.find(c => c.k === grps[0]) || {}).l : 'รวม';
+  badge.textContent = bl; badge.style.background = color + '22'; badge.style.color = color;
+  document.getElementById('sm-title').textContent = 'รายการพัสดุ: ' + label;
+  document.getElementById('sm-count').textContent = '...';
+  document.getElementById('sm-subtitle').textContent = 'กำลังโหลด...';
+  document.getElementById('status-overlay').classList.add('show');
+  await ensureAllItemsLoaded();
+  const ciCache = {};
+  smState.smRows = collectRowsByPredicate((it, headers, cat) => {
+    const ci = ciCache[cat.id] || (ciCache[cat.id] = bmColIdx(headers));
+    const inf = bmItemInfo(it, headers, ci, cat.id);
+    return want.has(inf.leaf) && grps.includes(inf.k);
+  });
+  smState.reopenFn = () => bmOpenSel(leaves, grps, label, color);
+  renderSmTable();
+}
+function bmExport(){
+  if(typeof XLSX === 'undefined'){ toast('โหลดตัวสร้างไฟล์ Excel ไม่ได้ (ตรวจการเชื่อมต่ออินเทอร์เน็ต)', 'error'); return; }
+  const { cols, sum, sumN, order, view } = bmBuildView();
+  if(!view.length){ toast('ไม่มีข้อมูลให้ส่งออก', 'error'); return; }
+  const out = [order.map(l => BM_LEVEL_LABEL[l]).concat(cols.map(c => c.l), ['รวม'])];
+  const nums = n => cols.map(c => n[c.k]).concat([sum(n)]);
+  const emit = (nodes, path) => nodes.forEach(nd => {
+    const p = path.concat([nd.text]);
+    if(nd.children){
+      emit(nd.children, p);
+      const r = p.slice(); r[r.length - 1] = 'รวม ' + nd.text; while(r.length < order.length) r.push('');
+      out.push(r.concat(nums(nd.n)));
+    } else {
+      // แถวล่างสุด: ทุกเครื่องในแถวมีประเภท/ยี่ห้อ/รุ่นเดียวกัน → เติมชื่อครบทุกคอลัมน์
+      const L = nd.leaves[0];
+      out.push(order.map((lv, i) => i < p.length ? p[i] : bmLabel(lv, L[lv])).concat(nums(nd.n)));
+    }
+  });
+  emit(view, []);
+  out.push(['รวมทั้งหมด'].concat(order.slice(1).map(() => '')).concat(nums(sumN(view.flatMap(v => v.leaves)))));
+  const ws = XLSX.utils.aoa_to_sheet(out);
+  ws['!cols'] = order.map(() => ({ wch:26 })).concat(cols.map(() => ({ wch:13 })), [{ wch:10 }]);
+  const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, BM.mode === 'brand' ? 'ตามยี่ห้อ' : 'ตามประเภท');
+  XLSX.writeFile(wb, 'สรุป' + (BM.mode === 'brand' ? 'ตามยี่ห้อ' : 'ตามประเภท') + '_ยี่ห้อรุ่น_สถานะ_' + trkYmd(new Date()) + '.xlsx');
+}
+
 // ─── Extra dashboard stats (คำนวณจากรายการทั้งหมด — โหลดหลัง dashboard หลักแสดงผลแล้ว) ──
 async function computeAndRenderExtraDashStats(){
   try {
@@ -1650,6 +1911,7 @@ async function computeAndRenderExtraDashStats(){
     S.dashExtra = extra;
     renderExtraDashCards(extra);
     renderExtraDashCharts(extra);
+    bmRender(); // BM
   } catch(e){
     toast('คำนวณสถิติเพิ่มเติมไม่สำเร็จ: '+e.message,'error');
   }
