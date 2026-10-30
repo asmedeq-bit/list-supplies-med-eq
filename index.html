@@ -390,6 +390,43 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
 .bm-num:hover{background:var(--primary-light);text-decoration:underline}
 .bm-zero{color:var(--border)}
 .bm-muted{color:var(--text-muted);font-style:italic;font-weight:400}
+/* ── BK: แก้พร้อมกันหลายเครื่อง ── */
+.bk-th,.bk-td{width:38px;min-width:38px;text-align:center}
+.bk-th input,.bk-td input{width:16px;height:16px;accent-color:var(--primary);cursor:pointer;vertical-align:middle}
+tr:has(.bk-chk:checked) td{background:var(--primary-light)}
+.bk-bar{display:none;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 20px;background:var(--primary-light);border-bottom:1px solid var(--primary)}
+.bk-bar.show{display:flex}
+.bk-bar-cnt{font-weight:700;font-size:13px;color:var(--primary)}
+.bk-bar-cnt small{font-weight:400;color:var(--text-muted)}
+.bk-steps{display:flex;gap:6px;flex-wrap:wrap;padding:10px 24px 0}
+.bk-step{font-size:11px;padding:3px 10px;border-radius:20px;border:1px solid var(--border);color:var(--text-muted)}
+.bk-step.on{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:700}
+.bk-hint{font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.6}
+.bk-row{display:grid;grid-template-columns:84px 170px 1fr;gap:10px;align-items:start;padding:8px 0;border-bottom:1px dashed var(--border)}
+.bk-row:last-child{border-bottom:none}
+.bk-on{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--text-muted);cursor:pointer;padding-top:9px}
+.bk-on input{width:15px;height:15px;accent-color:var(--primary)}
+.bk-name{font-weight:600;font-size:13px;padding-top:9px;word-break:break-word}
+.bk-row .plain-input:disabled{opacity:.45}
+.bk-row.on .plain-input{border-color:var(--primary)}
+.bk-cur{font-size:11px;color:var(--text-muted);margin-top:4px;line-height:1.5}
+.bk-cur b{color:var(--text);font-weight:600}
+.bk-row.lock{opacity:.65}
+.bk-lock{font-size:12px;color:var(--danger);padding-top:9px}
+.bk-auto{font-size:12px;color:#059669;padding-top:9px}
+.bk-sum{background:var(--bg);border-left:3px solid var(--primary);border-radius:8px;padding:10px 12px;font-size:13px;margin-bottom:12px;line-height:1.7}
+.bk-tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:8px}
+.bk-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.bk-tbl th{background:var(--thead-bg);color:var(--text-muted);font-weight:700;text-align:left;padding:8px 10px;border-bottom:2px solid var(--border);white-space:nowrap}
+.bk-tbl td{padding:7px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+.bk-old{color:var(--danger);text-decoration:line-through}
+.bk-new{color:#059669;font-weight:700}
+.bk-same{color:var(--text-muted)}
+.bk-res{border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.8;border:1px solid}
+.bk-res.ok{background:#10b98118;border-color:#10b98166}
+.bk-res.bad{background:#ef444418;border-color:#ef444466;margin-top:10px}
+.bk-res.note{background:#f59e0b18;border-color:#f59e0b66;margin-top:10px}
+@media (max-width:640px){ .bk-row{grid-template-columns:1fr;gap:4px} .bk-on,.bk-name,.bk-lock,.bk-auto{padding-top:0} }
 /* ── MOBILE: หน้าจอแคบ (มือถือ) — เมนูซ้ายเป็นลิ้นชักเปิดด้วยปุ่ม ☰ · จอคอมไม่เปลี่ยน ── */
 .btn-menu{display:none;width:38px;height:38px;border-radius:9px;border:1.5px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 #sidebar-backdrop{display:none}
@@ -633,6 +670,12 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
               </select>
             </div>
           </div>
+          <!-- BK: แถบแก้พร้อมกันหลายเครื่อง (แสดงเมื่อมีการติ๊กเลือก) -->
+          <div class="bk-bar" id="bk-bar">
+            <span class="bk-bar-cnt" id="bk-bar-cnt">เลือก 0 เครื่อง</span>
+            <button class="btn btn-primary btn-sm" onclick="bkOpen()"><i class="fas fa-pen-to-square"></i> แก้พร้อมกัน</button>
+            <button class="btn btn-ghost btn-sm" onclick="bkClear()">ยกเลิกเลือก</button>
+          </div>
           <div class="table-wrap" id="table-wrap">
             <table><thead id="table-head"></thead><tbody id="table-body"></tbody></table>
           </div>
@@ -872,6 +915,19 @@ tbody td{padding:9px 14px;color:var(--text);max-width:220px;overflow:hidden;text
       <button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>
       <button class="btn btn-primary" onclick="saveRow()"><i class="fas fa-save"></i> บันทึก</button>
     </div>
+  </div>
+</div>
+
+<!-- BK: แก้พร้อมกันหลายเครื่อง (อยู่ก่อน PIN เพื่อให้หน้าต่าง PIN ซ้อนอยู่ด้านบน) -->
+<div class="modal-overlay" id="bk-overlay">
+  <div class="modal" style="max-width:820px">
+    <div class="modal-header">
+      <h2 id="bk-title">แก้พร้อมกัน</h2>
+      <button class="modal-close" onclick="bkClose()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="bk-steps" id="bk-steps"></div>
+    <div class="modal-body" id="bk-body"></div>
+    <div class="modal-footer" id="bk-foot"></div>
   </div>
 </div>
 
@@ -1689,6 +1745,209 @@ function renderDashboard(st){
     </div>`).join('');
 }
 
+// ─── BK: แก้พร้อมกันหลายเครื่อง (ในตารางของประเภทที่เปิดอยู่) ───
+//  ติ๊กเลือกเครื่อง → ติ๊ก "เปลี่ยน" เฉพาะช่องที่จะแก้ → ตรวจ ค่าเดิม → ค่าใหม่ → PIN ครั้งเดียว → บันทึกทีละเครื่อง
+//  บันทึกด้วย rpc_upsert_item ตัวเดียวกับปุ่มแก้ไขปกติ (ไม่แก้ฐานข้อมูล) · ช่องที่ไม่ติ๊กของแต่ละเครื่องคงเดิมทุกช่อง
+//  คอลัมน์ที่ต้องไม่ซ้ำกัน (ทะเบียน / NVH / INH / S/N / หมายเลขรหัสสินทรัพย์) ล็อก แก้พร้อมกันไม่ได้
+const BK = { sel:new Set(), catId:null, plan:null, running:false, failed:[], result:null };
+function bkIsLocked(h){
+  const n = normH(h).toLowerCase();
+  return n.includes('หมายเลขทะเบียน') || n.includes('หมายเลขรหัสสินทรัพย์') || /^nvh/.test(n) || /^inh/.test(n) || /^(s\s*\/?\s*n|serial)\b/.test(n) || n === 'sn';
+}
+function bkHeadCell(){ return `<th class="bk-th"><input type="checkbox" id="bk-all" onchange="bkToggleAll(this.checked)" title="เลือก/ยกเลิกทั้งหมดตามตัวกรองที่ใช้อยู่"></th>`; }
+function bkRowCell(id){ return `<td class="bk-td"><input type="checkbox" class="bk-chk" ${BK.sel.has(id) ? 'checked' : ''} onchange="bkToggle(${id},this.checked)" title="เลือกเพื่อแก้พร้อมกัน"></td>`; }
+function bkToggle(id, on){ if(on) BK.sel.add(id); else BK.sel.delete(id); bkSync(); }
+function bkToggleAll(on){ (S.filteredRows || []).forEach(it => { if(on) BK.sel.add(it.id); else BK.sel.delete(it.id); }); document.querySelectorAll('#table-body .bk-chk').forEach(c => { c.checked = on; }); bkSync(); }
+function bkClear(){ BK.sel.clear(); document.querySelectorAll('#table-body .bk-chk').forEach(c => { c.checked = false; }); bkSync(); }
+/** เรียกท้าย renderTableBody — ล้างการเลือกเมื่อเปลี่ยนประเภท และอัปเดตแถบ/ช่องเลือกทั้งหมด */
+function bkSync(){
+  const cat = S.currentCat; if(!cat) return;
+  if(BK.catId !== cat.id){ BK.sel.clear(); BK.catId = cat.id; }
+  const exist = new Set((S.allItems[cat.id] || []).map(i => i.id));
+  [...BK.sel].forEach(id => { if(!exist.has(id)) BK.sel.delete(id); });
+  const vis = (S.filteredRows || []).map(i => i.id), nVis = vis.filter(id => BK.sel.has(id)).length, n = BK.sel.size;
+  const all = document.getElementById('bk-all');
+  if(all){ all.checked = vis.length > 0 && nVis === vis.length; all.indeterminate = nVis > 0 && nVis < vis.length; }
+  const bar = document.getElementById('bk-bar'); if(!bar) return;
+  bar.classList.toggle('show', n > 0);
+  document.getElementById('bk-bar-cnt').innerHTML = `เลือก ${n.toLocaleString()} เครื่อง` + (n > nVis ? ` <small>(${(n - nVis).toLocaleString()} เครื่องไม่อยู่ในผลกรองตอนนี้)</small>` : '');
+}
+function bkItems(){ const cat = S.currentCat; return cat ? (S.allItems[cat.id] || []).filter(it => BK.sel.has(it.id)) : []; }
+function bkVal(it, h){ const v = it.data ? it.data[h] : ''; return (v === undefined || v === null) ? '' : String(v); }
+function bkSteps(n){
+  const L = ['1 กรอกค่าที่จะเปลี่ยน','2 ตรวจ ค่าเดิม → ค่าใหม่','3 บันทึก','4 สรุปผล'];
+  document.getElementById('bk-steps').innerHTML = L.map((l,i) => `<span class="bk-step ${i + 1 === n ? 'on' : ''}">${l}</span>`).join('');
+}
+function bkIdHeader(headers){ const i = headers.findIndex(h => normH(h).includes('หมายเลขทะเบียน')); return i >= 0 ? headers[i] : headers[0]; }
+
+// ── ขั้น 1: ฟอร์ม ──
+function bkOpen(){
+  const cat = S.currentCat, items = bkItems();
+  if(!cat || !items.length){ toast('ยังไม่ได้เลือกเครื่อง', 'error'); return; }
+  const headers = cat.headers || [];
+  const { remainIdx } = getLifeCalcIndices(headers);
+  const keep = BK.plan && BK.plan.catId === cat.id ? BK.plan.fields : null;
+  document.getElementById('bk-title').innerHTML = `<i class="fas fa-pen-to-square" style="color:var(--primary)"></i> แก้พร้อมกัน ${items.length.toLocaleString()} เครื่อง <span style="font-size:12px;color:var(--text-muted);font-weight:400">— ${escHtml(cat.name)}</span>`;
+  bkSteps(1);
+  const rows = headers.map((h,i) => {
+    if(i === remainIdx) return `<div class="bk-row lock"><span></span><div class="bk-name">${escHtml(h)}</div><div class="bk-auto"><i class="fas fa-magic"></i> คำนวณใหม่อัตโนมัติเมื่อแก้วันที่ได้มา หรืออายุที่กำหนด</div></div>`;
+    if(bkIsLocked(h)) return `<div class="bk-row lock"><span class="bk-lock"><i class="fas fa-lock"></i> ล็อก</span><div class="bk-name">${escHtml(h)}</div><div class="bk-lock">ต้องไม่ซ้ำกัน — แก้ทีละเครื่องเท่านั้น</div></div>`;
+    const cnt = {}; items.forEach(it => { const v = bkVal(it, h).trim() || '(ว่าง)'; cnt[v] = (cnt[v]||0) + 1; });
+    const top = Object.entries(cnt).sort((a,b) => b[1]-a[1]);
+    const cur = top.slice(0,4).map(([v,n]) => `<b>${escHtml(v.length > 40 ? v.slice(0,39) + '…' : v)}</b> (${n})`).join(', ') + (top.length > 4 ? ` และอีก ${top.length - 4} ค่า` : '');
+    const isDate = DATE_FIELDS.some(d => h.includes(d.trim())), isNum = NUM_FIELDS.some(d => h.trim() === d.trim());
+    const opts = new Set([...(STATIC_DROPDOWNS[h.trim()] || STATIC_DROPDOWNS[h] || [])]);
+    (S.allItems[cat.id] || []).forEach(it => { const v = bkVal(it, h).trim(); if(v && opts.size < 300) opts.add(v); });
+    const k = keep && keep[i], on = !!(k && k.on), val = k ? k.v : '';
+    const input = isDate ? `<input type="date" class="plain-input" id="bk-v-${i}" value="${escHtml(val)}" ${on ? '' : 'disabled'}>`
+      : isNum ? `<input type="number" step="any" class="plain-input" id="bk-v-${i}" value="${escHtml(val)}" ${on ? '' : 'disabled'} placeholder="ค่าใหม่ (เว้นว่าง = ล้างเป็นค่าว่าง)">`
+      : `<input type="text" class="plain-input" id="bk-v-${i}" value="${escHtml(val)}" ${on ? '' : 'disabled'} list="bk-dl-${i}" placeholder="ค่าใหม่ (เว้นว่าง = ล้างเป็นค่าว่าง)"><datalist id="bk-dl-${i}">${[...opts].map(o => `<option value="${escHtml(o)}"></option>`).join('')}</datalist>`;
+    return `<div class="bk-row ${on ? 'on' : ''}" id="bk-r-${i}"><label class="bk-on"><input type="checkbox" id="bk-on-${i}" ${on ? 'checked' : ''} onchange="bkOnToggle(${i})"> เปลี่ยน</label>
+      <div class="bk-name">${escHtml(h)}</div><div>${input}<div class="bk-cur">ค่าปัจจุบัน: ${cur}</div></div></div>`;
+  }).join('');
+  document.getElementById('bk-body').innerHTML = `<div class="bk-hint">ติ๊ก <b>"เปลี่ยน"</b> เฉพาะช่องที่ต้องการแก้ — ช่องที่ไม่ติ๊ก ข้อมูลของแต่ละเครื่องคงเดิม · ใต้ช่องบอกค่าปัจจุบันของเครื่องที่เลือก (จำนวนเครื่อง)</div>${rows}`;
+  document.getElementById('bk-foot').innerHTML = `<button class="btn btn-ghost" onclick="bkClose()">ยกเลิก</button><button class="btn btn-primary" id="bk-next" onclick="bkPreview()">ตรวจก่อนบันทึก <i class="fas fa-arrow-right"></i></button>`;
+  bkUpdateNext();
+  document.getElementById('bk-overlay').classList.add('show');
+}
+function bkOnToggle(i){
+  const on = document.getElementById('bk-on-' + i).checked, inp = document.getElementById('bk-v-' + i);
+  inp.disabled = !on; document.getElementById('bk-r-' + i).classList.toggle('on', on);
+  if(on && !inp.value && inp.type !== 'date'){
+    const h = S.currentCat.headers[i], cnt = {};
+    bkItems().forEach(it => { const v = bkVal(it, h).trim(); if(v) cnt[v] = (cnt[v]||0) + 1; });
+    const top = Object.entries(cnt).sort((a,b) => b[1]-a[1])[0]; if(top) inp.value = top[0];
+  }
+  if(on) inp.focus();
+  bkUpdateNext();
+}
+function bkUpdateNext(){
+  const btn = document.getElementById('bk-next'); if(!btn) return;
+  btn.disabled = !document.querySelector('#bk-body [id^="bk-on-"]:checked');
+  btn.style.opacity = btn.disabled ? '.5' : '1';
+}
+function bkReadFields(){
+  const f = {};
+  (S.currentCat.headers || []).forEach((h,i) => { const on = document.getElementById('bk-on-' + i); if(on) f[i] = { on: on.checked, v: (document.getElementById('bk-v-' + i).value || '').trim() }; });
+  return f;
+}
+
+// ── ขั้น 2: ตรวจ ค่าเดิม → ค่าใหม่ ──
+function bkPreview(){
+  const cat = S.currentCat; if(!cat) return;
+  const headers = cat.headers || [], fields = bkReadFields();
+  const ch = Object.keys(fields).filter(i => fields[i].on).map(i => ({ i:+i, h: headers[i], v: fields[i].v }));
+  if(!ch.length) return;
+  const items = bkItems();
+  const rows = items.map(it => ({ it, diffs: ch.map(c => { const old = bkVal(it, c.h); return { c, old, same: old.trim() === c.v }; }) }));
+  const will = rows.filter(r => r.diffs.some(d => !d.same));
+  const { remainIdx, lifespanIdx, dateIdx } = getLifeCalcIndices(headers);
+  const recalc = remainIdx >= 0 && ch.some(c => c.i === lifespanIdx || c.i === dateIdx);
+  BK.plan = { catId: cat.id, fields, ch, ids: will.map(r => r.it.id), recalc };
+  bkSteps(2);
+  const idH = bkIdHeader(headers), short = s => { s = String(s); return s.length > 34 ? s.slice(0,33) + '…' : s; };
+  document.getElementById('bk-body').innerHTML = `<div class="bk-sum">เปลี่ยน ${ch.map(c => `<b>${escHtml(c.h)}</b> → "${escHtml(c.v || '(ว่าง)')}"`).join(', ')}<br>
+      เครื่องที่จะถูกแก้ <b>${will.length.toLocaleString()}</b> จาก ${items.length.toLocaleString()} เครื่อง${items.length - will.length ? ` · อีก ${(items.length - will.length).toLocaleString()} เครื่องค่าเหมือนเดิมอยู่แล้ว (ข้าม)` : ''}<br>
+      <span style="color:var(--text-muted)">ช่องอื่นของแต่ละเครื่องไม่เปลี่ยน${recalc ? ' · อายุใช้งานคงเหลือจะคำนวณใหม่ให้แต่ละเครื่อง' : ''}</span></div>
+    <div class="bk-tbl-wrap"><table class="bk-tbl"><thead><tr><th>#</th><th>${escHtml(idH)}</th>${ch.map(c => `<th>${escHtml(c.h)}</th>`).join('')}</tr></thead><tbody>
+    ${rows.map((r,n) => `<tr><td>${n + 1}</td><td>${escHtml(short(bkVal(r.it, idH)) || '#' + r.it.id)}</td>${r.diffs.map(d => d.same
+        ? `<td class="bk-same">${escHtml(short(d.old) || '(ว่าง)')} (เหมือนเดิม)</td>`
+        : `<td><span class="bk-old">${escHtml(short(d.old) || '(ว่าง)')}</span> → <span class="bk-new">${escHtml(short(d.c.v) || '(ว่าง)')}</span></td>`).join('')}</tr>`).join('')}
+    </tbody></table></div>`;
+  document.getElementById('bk-foot').innerHTML = `<button class="btn btn-ghost" onclick="bkOpen()"><i class="fas fa-arrow-left"></i> กลับไปแก้</button>
+    <button class="btn btn-primary" ${will.length ? '' : 'disabled style="opacity:.5"'} onclick="bkConfirm()"><i class="fas fa-lock"></i> ยืนยัน · ใส่ PIN</button>`;
+}
+function bkConfirm(){
+  const p = BK.plan; if(!p || !p.ids.length) return;
+  requirePin(`บันทึกแก้พร้อมกัน ${p.ids.length.toLocaleString()} เครื่อง`, () => bkApply(p.ids));
+}
+
+// ── ขั้น 3: บันทึกทีละเครื่อง (rpc เดิม) ──
+async function bkApply(ids){
+  const p = BK.plan, cat = S.categories.find(c => c.id === (p && p.catId));
+  if(!p || !cat || BK.running) return;
+  BK.running = true; bkSteps(3);
+  document.getElementById('bk-foot').innerHTML = '';
+  const headers = cat.headers || [];
+  const sk = headers.findIndex(isStatusCol), dk = headers.findIndex(isDeptCol);
+  const { remainIdx, lifespanIdx, dateIdx } = getLifeCalcIndices(headers);
+  const ok = [], failed = [], statusMoves = [];
+  for(let n = 0; n < ids.length; n++){
+    document.getElementById('bk-body').innerHTML = `<div style="text-align:center;padding:30px 0"><i class="fas fa-spinner fa-spin" style="font-size:24px;color:var(--primary)"></i><div style="margin-top:10px">กำลังบันทึก ${n + 1} / ${ids.length} เครื่อง... (อย่าปิดหน้านี้)</div></div>`;
+    const it = (S.allItems[cat.id] || []).find(x => x.id === ids[n]);
+    if(!it){ failed.push({ id: ids[n], msg: 'ไม่พบเครื่องนี้แล้ว (อาจถูกลบ)' }); continue; }
+    const obj = Object.assign({}, it.data || {});
+    headers.forEach(h => { if(obj[h] === undefined || obj[h] === null) obj[h] = ''; });
+    p.ch.forEach(c => { obj[c.h] = c.v; });
+    if(p.recalc){
+      const dv = String(obj[headers[dateIdx]] || ''), lv = String(obj[headers[lifespanIdx]] || '');
+      const res = calcRemainingLife(dv, lv);
+      if(res) obj[headers[remainIdx]] = res.text; else if(dv && lv) obj[headers[remainIdx]] = 'ไม่สามารถคำนวณได้';
+    }
+    const prevStatus = normalizeStatus(it.status || '');
+    const status = sk >= 0 ? normalizeStatus(obj[headers[sk]]) : null;
+    const dept = dk >= 0 ? String(obj[headers[dk]] || '').trim() || null : null;
+    try {
+      const { error } = await sb.rpc('rpc_upsert_item', { p_id: it.id, p_category_id: cat.id, p_data: obj, p_status: status, p_department: dept, p_row_index: 0, p_pin: PIN_CORRECT });
+      if(error) throw error;
+      ok.push(it.id);
+      if(status !== null && status !== prevStatus) statusMoves.push({ id: it.id, from: prevStatus, to: status });
+    } catch(e){ failed.push({ id: it.id, msg: e.message, label: bkVal(it, bkIdHeader(headers)) }); }
+  }
+  document.getElementById('bk-body').innerHTML = `<div style="text-align:center;padding:30px 0"><i class="fas fa-spinner fa-spin" style="font-size:24px;color:var(--primary)"></i><div style="margin-top:10px">กำลังโหลดข้อมูลใหม่...</div></div>`;
+  BK.sel = new Set(failed.map(f => f.id)); BK.failed = failed;   // เครื่องที่ไม่สำเร็จยังเลือกค้างไว้ (ตั้งก่อนโหลดตารางใหม่)
+  try { await invalidate(); } catch(e){ /* ตารางจะโหลดใหม่เมื่อกดรีเฟรช */ }
+  const sync = await bkSyncLinked(ok, cat.id);
+  BK.running = false;
+  bkSync();
+  if(!failed.length) BK.plan = null;   // สำเร็จหมด → เปิดครั้งหน้าเริ่มฟอร์มใหม่
+  bkResult(ok, failed, statusMoves, sync);
+}
+/** อัปเดตข้อมูลเครื่องในเรื่องติดตามที่เชื่อมอยู่ (เงียบ ๆ แล้วสรุปรวมครั้งเดียว) — กติกาเดียวกับ trkSyncSnapshots */
+async function bkSyncLinked(ids, catId){
+  const out = { n:0, fail:0 };
+  if(typeof TRK === 'undefined' || !TRK.loaded) return out;
+  const cat = S.categories.find(c => c.id === catId); if(!cat) return out;
+  for(const id of ids){
+    const item = (S.allItems[cat.id] || []).find(i => i.id === id); if(!item) continue;
+    for(const r of (TRK.byItem[id] || []).slice()){
+      const diff = trkItemDiff(r, item, cat); if(!diff.length) continue;
+      const payload = Object.assign({}, r); diff.forEach(d => { payload[d.k] = d.to; });
+      try {
+        const { data, error } = await sb.rpc('rpc_upsert_tracking', { p_id: r.id, p_payload: payload, p_pin: PIN_CORRECT });
+        if(error) throw error;
+        const ix = TRK.rows.findIndex(x => x.id === data.id); if(ix >= 0) TRK.rows[ix] = data;
+        out.n++;
+      } catch(e){ out.fail++; }
+    }
+  }
+  if(out.n){ trkIndex(); trkRerender(); trkRefreshItemTable(); }
+  return out;
+}
+
+// ── ขั้น 4: สรุปผล ──
+function bkResult(ok, failed, statusMoves, sync){
+  bkSteps(4);
+  const cat = S.currentCat, notes = [];
+  if(statusMoves.length){
+    const to = {}; statusMoves.forEach(m => { to[m.to || '(ว่าง)'] = (to[m.to || '(ว่าง)'] || 0) + 1; });
+    const needDispose = statusMoves.filter(m => { const g = trkStatusGroup(m.to); return (g === 'broken' || g === 'wait') && trkStatusGroup(m.from) !== g && !(TRK.byItem[m.id] || []).some(r => r.kind === 'dispose'); }).length;
+    const needReg = statusMoves.filter(m => String(m.to).includes('รอขึ้นทะเบียน') && !(TRK.byItem[m.id] || []).some(r => r.kind === 'register')).length;
+    notes.push(`สถานะเปลี่ยน: ${Object.entries(to).map(([s,n]) => `"${escHtml(s)}" ${n} เครื่อง`).join(', ')}`);
+    if(needDispose) notes.push(`มี ${needDispose} เครื่องที่ยังไม่มีเรื่องจำหน่าย — เปิดเรื่องได้จากปุ่ม <i class="fas fa-route"></i> ในแถวของเครื่อง (ระบบไม่เด้งถามทีละเครื่องเมื่อแก้พร้อมกัน)`);
+    if(needReg) notes.push(`มี ${needReg} เครื่องที่ยังไม่มีเรื่องขึ้นทะเบียน — เปิดเรื่องได้จากปุ่ม <i class="fas fa-route"></i> ในแถวของเครื่อง`);
+  }
+  if(sync.n) notes.push(`อัปเดตข้อมูลเครื่องในเรื่องติดตามที่เชื่อมอยู่ ${sync.n} เรื่อง`);
+  if(sync.fail) notes.push(`<span style="color:var(--danger)">อัปเดตเรื่องติดตามไม่สำเร็จ ${sync.fail} เรื่อง (ข้อมูลเครื่องในเรื่องจะดึงใหม่เมื่อเปิดแก้ไขเรื่องนั้น)</span>`);
+  document.getElementById('bk-body').innerHTML = `<div class="bk-res ok"><i class="fas fa-check-circle" style="color:#059669"></i> บันทึกสำเร็จ <b>${ok.length.toLocaleString()}</b> เครื่อง${cat ? ' — ' + escHtml(cat.name) : ''}</div>
+    ${failed.length ? `<div class="bk-res bad"><i class="fas fa-exclamation-circle" style="color:var(--danger)"></i> ไม่สำเร็จ <b>${failed.length}</b> เครื่อง (ยังเลือกค้างไว้ในตาราง กด "ลองใหม่" ได้)<br>${failed.map(f => `• ${escHtml(f.label || '#' + f.id)} — ${escHtml(f.msg)}`).join('<br>')}</div>` : ''}
+    ${notes.length ? `<div class="bk-res note">${notes.join('<br>')}</div>` : ''}`;
+  document.getElementById('bk-foot').innerHTML = (failed.length ? `<button class="btn btn-outline" onclick="bkRetry()"><i class="fas fa-rotate-right"></i> ลองใหม่เฉพาะที่ไม่สำเร็จ</button>` : '') + `<button class="btn btn-primary" onclick="bkClose()">ปิด</button>`;
+  toast(failed.length ? `แก้พร้อมกัน: สำเร็จ ${ok.length} · ไม่สำเร็จ ${failed.length}` : `แก้พร้อมกันสำเร็จ ${ok.length} เครื่อง`, failed.length ? 'error' : 'success');
+}
+function bkRetry(){ if(!BK.plan) return; const ids = BK.failed.map(f => f.id).filter(id => (S.allItems[BK.plan.catId] || []).some(i => i.id === id)); if(ids.length) bkApply(ids); }
+function bkClose(){ if(BK.running) return; document.getElementById('bk-overlay').classList.remove('show'); }
+
 // ─── BM: ตารางสรุปตามประเภท / ยี่ห้อ / รุ่น / สถานะภาพ ───
 //  คำนวณจากข้อมูลที่ Dashboard โหลดไว้แล้ว (S.allItems) — อ่านอย่างเดียว ไม่แก้ฐานข้อมูล
 //  2 มุมมอง: ตามประเภท (ประเภท → ยี่ห้อ → รุ่น) · ตามยี่ห้อ (ยี่ห้อ → ประเภท → รุ่น ยี่ห้อเดียวกันรวมข้ามประเภท)
@@ -2505,7 +2764,7 @@ function renderTableBody(headers, rawQ){
   // indices for remaining-life display in table
   const { remainIdx, lifespanIdx, dateIdx } = getLifeCalcIndices(headers);
 
-  document.getElementById('table-head').innerHTML = `<tr>
+  document.getElementById('table-head').innerHTML = `<tr>${bkHeadCell() /* BK */}
     <th style="width:44px;min-width:44px">#</th>
     ${headers.map((h,i)=>{
       const icon = S.sortCol===i ? (S.sortDir==='asc'?'fa-sort-up':'fa-sort-down') : 'fa-sort';
@@ -2516,7 +2775,7 @@ function renderTableBody(headers, rawQ){
   </tr>`;
 
   document.getElementById('table-body').innerHTML = pageRows.length ? pageRows.map((it,ri)=>{
-    return `<tr>
+    return `<tr>${bkRowCell(it.id) /* BK */}
       <td style="color:var(--text-muted);font-size:11px;font-weight:600;background:var(--thead-bg)">${start+ri+1}</td>
       ${headers.map((h,ci)=>{
         const val = (it.data && it.data[h] !== undefined && it.data[h] !== null) ? String(it.data[h]) : '';
@@ -2557,6 +2816,7 @@ function renderTableBody(headers, rawQ){
   document.getElementById('record-count').textContent = `${Math.min(start+1,total)}–${Math.min(start+S.pageSize,total)} จาก ${total} รายการ`;
   document.getElementById('page-info').textContent = `หน้า ${S.currentPage}/${pages} (${total} รายการ)`;
   renderPagination(pages);
+  bkSync(); // BK
 }
 
 function getStCls(v){
