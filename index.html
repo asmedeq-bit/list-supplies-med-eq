@@ -1692,7 +1692,7 @@ function renderDashboard(st){
 // ─── BM: ตารางสรุปตามประเภท / ยี่ห้อ / รุ่น / สถานะภาพ ───
 //  คำนวณจากข้อมูลที่ Dashboard โหลดไว้แล้ว (S.allItems) — อ่านอย่างเดียว ไม่แก้ฐานข้อมูล
 //  2 มุมมอง: ตามประเภท (ประเภท → ยี่ห้อ → รุ่น) · ตามยี่ห้อ (ยี่ห้อ → ประเภท → รุ่น ยี่ห้อเดียวกันรวมข้ามประเภท)
-//  ยี่ห้อ/รุ่น: จากคอลัมน์ "ยี่ห้อ" และ "รุ่น" · ตัวพิมพ์เล็ก-ใหญ่/ช่องว่างต่างกันนับเป็นค่าเดียว (แสดงตามค่าที่พบบ่อยสุด)
+//  ยี่ห้อ/รุ่น: จากคอลัมน์ "ยี่ห้อ" และ "รุ่น" · ไม่สนตัวพิมพ์เล็ก-ใหญ่ ช่องว่าง ขีด (-) และจุด (.) เช่น "TE- LM835" = "te-lm835" = "TELM835" (แสดงตามค่าที่พบบ่อยสุด)
 //  ไม่เดาแยกยี่ห้อจากข้อความ — ถ้าช่องยี่ห้อกรอกต่างกัน จะแยกกลุ่มตามที่กรอกจริง
 //  สถานะ: อ่านแบบเดียวกับหน้าต่างรายการสถานะ (คอลัมน์สถานะภาพ) แล้วจัดกลุ่มตามกติกาเดียวกับระบบติดตาม (trkStatusGroup)
 const BM_COLS = [
@@ -1710,6 +1710,8 @@ const BM_LEVEL_LABEL = { c:'ประเภท', b:'ยี่ห้อ', m:'ร�
 const BM = { mode:'cat', leaves:[], names:{ b:{}, m:{} }, catName:{}, open:new Set(), cells:[], tgl:[], view:[] };
 function bmZero(){ const o = {}; BM_COLS.forEach(c => { o[c.k] = 0; }); return o; }
 function bmNorm(v){ return trkClean(v).replace(/\s+/g,' ').trim(); }
+/** คีย์สำหรับจัดกลุ่ม: ตัดช่องว่าง ขีด (รวม ‐‑–—) และจุดออก + ตัวพิมพ์เล็ก — ค่าที่เหลือว่าง (เช่น "-") นับเป็นไม่ระบุ */
+function bmKey(s){ return String(s).toLowerCase().replace(/[\s\-\u2010-\u2014.]/g, ''); }
 function bmGroup(sv){
   sv = String(sv||'').trim();
   if(!sv || sv === 'ไม่ระบุ' || sv === 'ไม่ระบุสถานะ') return 'none';
@@ -1727,8 +1729,8 @@ function bmColIdx(headers){
 function bmItemInfo(it, headers, ci, catId){
   const b = ci.b >= 0 ? bmNorm(it.data?.[headers[ci.b]]) : null;
   const m = ci.m >= 0 ? bmNorm(it.data?.[headers[ci.m]]) : null;
-  const bk = b === null ? BM_NONE : b.toLowerCase();
-  const mk = m === null ? BM_NONE : m.toLowerCase();
+  const bk = b === null ? BM_NONE : bmKey(b);
+  const mk = m === null ? BM_NONE : bmKey(m);
   const k = bmGroup(ci.s >= 0 ? normalizeStatus(it.data?.[headers[ci.s]]) : '');
   return { b, m, bk, mk, k, leaf: catId + BM_SEP + bk + BM_SEP + mk };
 }
